@@ -1,6 +1,6 @@
 exports.up = function (knex) {
   return knex.schema.createTable('books', function (table) {
-    table.integer('id').notNullable().unique().primary();
+    table.increments('id').notNullable().unique().primary();
     table.string('googleId').notNullable().unique();
     table.string('title').notNullable();
     table.string('authors').notNullable();
@@ -18,7 +18,7 @@ exports.up = function (knex) {
     table.string('textSnippet');
     table.string('buyLink');
     table.boolean('publicDomain');
-    table.decimal('averageRange');
+    table.decimal('averageRating');
   });
 };
 
