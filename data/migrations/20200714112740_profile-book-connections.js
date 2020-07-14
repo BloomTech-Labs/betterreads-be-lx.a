@@ -33,5 +33,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.dropTableIfExists("profile_book_connections")
+  return knex.schema.dropTableIfExists("profile_book_connections")
 };
