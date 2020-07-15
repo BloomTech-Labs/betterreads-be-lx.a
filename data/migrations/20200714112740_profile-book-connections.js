@@ -18,7 +18,7 @@ exports.up = function (knex) {
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
     table
-      .string('readingStatus')
+      .integer('readingStatus')
       .unsigned()
       .notNullable()
       .references('id')
