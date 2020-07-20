@@ -39,11 +39,9 @@ router.post('/', (req, res) => {
         if (br == undefined) {
           //book not found so lets insert it
           Books.create(book)
-            .then((book) =>
-              res
-                .status(200)
-                .json({ message: 'book created', profile: book[0] })
-            )
+            .then((book) => {
+              res.status(200).json({ message: 'book created', book: book });
+            })
             .catch((err) => {
               console.error(err);
               res.status(500).json({ message: err.message });
