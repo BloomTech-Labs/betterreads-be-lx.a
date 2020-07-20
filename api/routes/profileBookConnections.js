@@ -36,6 +36,28 @@ router.get('/:id', function (req, res) {
     });
 });
 
+// To only GET the connections for a specified user
+
+router.get('/profile/:id', function (req, res) {
+  const profileId = String(req.params.id);
+  Connections.findBy({ profileId })
+    .then((connections) => {
+      if (connections) {
+        res.status(200).json(connections);
+      } else {
+        res.status(404).json({
+          error: `Profile-book connections with profile id ${profileId} not found.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: `Failure to GET profile-book connections with profile id ${profileId}.`,
+        error: err.message,
+      });
+    });
+});
+
 // Required in request body: profileId, bookId, and readingStatus (an integer, 1-3)
 router.post('/', (req, res) => {
   const connection = req.body;
