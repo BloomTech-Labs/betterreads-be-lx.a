@@ -73,7 +73,7 @@ router.post('/', (req, res) => {
             .then((newConnection) => {
               res.status(200).json({
                 message: 'profile-book connection created',
-                book: newConnection,
+                connection: newConnection,
               });
             })
             .catch((err) => {
@@ -105,8 +105,7 @@ router.put('/:id', (req, res) => {
   const id = String(req.params.id);
   const connectionInfo = req.body;
   if (connectionInfo) {
-    Connections.findBy({ id })
-      .first()
+    Connections.findById(id)
       .then((connectionResponse) => {
         if (connectionResponse == undefined) {
           res.status(400).json({
@@ -140,15 +139,36 @@ router.put('/:id', (req, res) => {
   }
 });
 
-module.exports = router;
+router.delete('/:id', (req, res) => {
+  const id = req.params.id;
+  Connections.findById(id)
+    .then((connection) => {
+      if (connection) {
+        Connections.remove(id)
+          .then((deleted) => {
+            res.status(200).json({
+              message: `Profile-book connection with id ${id} was deleted.`,
+              count_of_deleted_connections: deleted,
+            });
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: `Could not delete profile-book connection with id: ${id}`,
+              error: err.message,
+            });
+          });
+      } else {
+        res.status(404).json({
+          error: `Profile-book connection with id ${id} not found.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: `Profile-book connection with id ${id} not found.`,
+        error: err.message,
+      });
+    });
+});
 
-/*
-Books.create(book)
-              .then((book) => {
-                res.status(200).json({ message: 'book created', book: book });
-              })
-              .catch((err) => {
-                console.error(err);
-                res.status(500).json({ message: err.message });
-              });
-*/
+module.exports = router;
