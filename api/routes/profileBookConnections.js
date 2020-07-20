@@ -64,7 +64,6 @@ router.post('/', (req, res) => {
   if (connection) {
     const profileId = connection.profileId || 0;
     const bookId = connection.bookId || 0;
-    const id = connection.id || 0;
     Connections.findBy({ profileId, bookId })
       .first()
       .then((connectionResult) => {
@@ -102,4 +101,54 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const id = String(req.params.id);
+  const connectionInfo = req.body;
+  if (connectionInfo) {
+    Connections.findBy({ id })
+      .first()
+      .then((connectionResponse) => {
+        if (connectionResponse == undefined) {
+          res.status(400).json({
+            message: `Profile-book connection with id ${id} not found.`,
+          });
+        } else {
+          Connections.update(id, connectionInfo)
+            .then((updatedConnection) => {
+              res.status(200).json({
+                message: `Profile-book connection with id ${id} is updated.`,
+                connection: updatedConnection,
+              });
+            })
+            .catch((err) => {
+              res.status(500).json({
+                message: `Failure to update profile-book connection with id ${id}`,
+                error: err.message,
+              });
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: err.message });
+      });
+  } else {
+    res.status(400).json({
+      message:
+        'Request body is missing the connection info needed for an update.',
+    });
+  }
+});
+
 module.exports = router;
+
+/*
+Books.create(book)
+              .then((book) => {
+                res.status(200).json({ message: 'book created', book: book });
+              })
+              .catch((err) => {
+                console.error(err);
+                res.status(500).json({ message: err.message });
+              });
+*/
