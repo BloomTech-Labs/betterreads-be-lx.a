@@ -40,8 +40,10 @@ router.get('/:id', function (req, res) {
 router.post('/', (req, res) => {
   const connection = req.body;
   if (connection) {
+    const profileId = connection.profileId || 0;
+    const bookId = connection.bookId || 0;
     const id = connection.id || 0;
-    Connections.findBy({ id })
+    Connections.findBy({ profileId, bookId })
       .first()
       .then((connectionResult) => {
         if (connectionResult == undefined) {
@@ -62,7 +64,7 @@ router.post('/', (req, res) => {
             });
         } else {
           res.status(400).json({
-            message: `Profile-book connection with id ${id} already exists`,
+            message: `Profile-book connection with id ${connectionResult.id} already exists`,
           });
         }
       })
