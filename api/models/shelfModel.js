@@ -27,7 +27,7 @@ function update(id, new_info) {
 }
 
 const remove = async (id) => {
-  return await db('profile_book_connections').where({ id }).del();
+  return await db('shelves').where({ id }).del();
 };
 
 module.exports = { findAll, findBy, findById, create, update, remove };

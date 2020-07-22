@@ -98,4 +98,36 @@ router.put('/:id', (req, res) => {
   }
 });
 
+router.delete('/:id', (req, res) => {
+  const id = req.params.id;
+  Shelves.findById(id)
+    .then((shelf) => {
+      if (shelf) {
+        Shelves.remove(id)
+          .then((deleted) => {
+            res.status(200).json({
+              message: `Shelf with id ${id} was deleted.`,
+              count_of_deleted_shelves: deleted,
+            });
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: `Could not delete shelf with id: ${id}`,
+              error: err.message,
+            });
+          });
+      } else {
+        res.status(404).json({
+          error: `Shelf with id ${id} not found.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: `Shelf with id ${id} not found.`,
+        error: err.message,
+      });
+    });
+});
+
 module.exports = router;
