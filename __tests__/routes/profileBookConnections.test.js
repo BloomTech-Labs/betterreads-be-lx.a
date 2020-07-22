@@ -50,4 +50,22 @@ describe('profile-book router endpoints', () => {
       );
     });
   });
+
+  describe('GET /connect/profile/:id', () => {
+    it('should return 200 when profile-book connections found for specified user', async () => {
+      Connections.findBy.mockResolvedValue({
+        id: 20,
+        profileId: 2,
+        bookId: 3,
+        readingStatus: 1,
+      });
+      const res = await request(server).get('/connect/profile/2');
+
+      expect(res.status).toBe(200);
+      expect(res.body.profileId).toBe(2);
+      expect(res.body.bookId).toBe(3);
+      expect(res.body.readingStatus).toBe(1);
+      expect(Connections.findBy.mock.calls.length).toBe(1);
+    });
+  });
 });
