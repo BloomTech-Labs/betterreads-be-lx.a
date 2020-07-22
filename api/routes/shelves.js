@@ -1,6 +1,7 @@
 const express = require('express');
 // const authRequired = require('../middleware/authRequired');
 const Shelves = require('../models/shelfModel');
+const Profiles = require('../models/profileModel');
 const router = express.Router();
 
 router.get('/', function (req, res) {
@@ -22,6 +23,40 @@ router.get('/:id', function (req, res) {
         res.status(200).json(shelf);
       } else {
         res.status(404).json({ error: 'ShelfNotFound' });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err.message });
+    });
+});
+
+// GET all shelves of specified user only
+
+router.get('/profile/:id', function (req, res) {
+  const profileId = String(req.params.id);
+  // First, check that profileId is for a valid user
+  Profiles.findById(profileId)
+    .then((pr) => {
+      if (pr) {
+        // Then, find all shelves belonging to this user
+        Shelves.findBy({ profileId })
+          .then((shelves) => {
+            if (shelves) {
+              res.status(200).json(shelves);
+            } else {
+              res.status(404).json({
+                error: `Shelves for user with profile id ${profileId} not found.`,
+              });
+            }
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: `Failure to GET shelves for user with profile id ${profileId}.`,
+              error: err.message,
+            });
+          });
+      } else {
+        res.status(404).json({ error: 'ProfileNotFound' });
       }
     })
     .catch((err) => {
