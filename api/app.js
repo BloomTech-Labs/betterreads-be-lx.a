@@ -54,6 +54,7 @@ app.use(['/profile', '/profiles'], profileRouter);
 app.use(['/book', '/books'], bookRouter);
 app.use('/connect', connectionRouter);
 app.use(['/shelf', '/shelves'], shelfRouter);
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
