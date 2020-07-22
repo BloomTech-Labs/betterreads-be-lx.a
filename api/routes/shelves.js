@@ -61,4 +61,41 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const id = String(req.params.id);
+  const shelfInfo = req.body;
+  if (shelfInfo) {
+    Shelves.findById(id)
+      .then((shelfResponse) => {
+        if (shelfResponse == undefined) {
+          res.status(400).json({
+            message: `Shelf with id ${id} not found.`,
+          });
+        } else {
+          Shelves.update(id, shelfInfo)
+            .then((updatedShelf) => {
+              res.status(200).json({
+                message: `Shelf with id ${id} is updated.`,
+                shelf: updatedShelf,
+              });
+            })
+            .catch((err) => {
+              res.status(500).json({
+                message: `Failure to update shelf with id ${id}`,
+                error: err.message,
+              });
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: err.message });
+      });
+  } else {
+    res.status(400).json({
+      message: 'Request body is missing the shelf info needed for an update.',
+    });
+  }
+});
+
 module.exports = router;
