@@ -69,7 +69,7 @@ app.use(function (err, req, res, next) {
       res.locals.error = err;
     }
   }
-  console.error(err);
+  // console.error(err); // When uncommented, this line throws an error when running tests. "not found"
   if (process.env.NODE_ENV === 'production' && !res.locals.message) {
     res.locals.message = 'ApplicationError';
     res.locals.status = 500;
