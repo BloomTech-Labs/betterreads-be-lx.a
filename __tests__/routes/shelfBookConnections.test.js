@@ -49,4 +49,28 @@ describe('shelf-book router endpoints', () => {
       );
     });
   });
+
+  describe('GET /organize/shelf/:shelfId', () => {
+    it('should return 200 when shelf-book connections found for specified shelf', async () => {
+      shelfBookConnections.findBy.mockResolvedValue([
+        {
+          id: 20,
+          ShelfId: 2,
+          ConnectionId: 3,
+        },
+        {
+          id: 21,
+          ShelfId: 2,
+          ConnectionId: 4,
+        },
+      ]);
+      const res = await request(server).get('/organize/shelf/2');
+
+      expect(res.status).toBe(200);
+      expect(res.body[0].id).toBe(20);
+      expect(res.body[0].ShelfId).toBe(2);
+      expect(res.body[0].ConnectionId).toBe(3);
+      expect(shelfBookConnections.findBy.mock.calls.length).toBe(1);
+    });
+  });
 });
