@@ -25,12 +25,62 @@ router.get('/', (req, res) => {
     .get(query)
     .then((response) => {
       const responseParsed = response.data.items.map((book) => {
+        let isbn10 = '';
+        let isbn13 = '';
+        if (book.volumeInfo.industryIdentifiers) {
+          for (let i = 0; i < book.volumeInfo.industryIdentifiers.length; i++) {
+            if (book.volumeInfo.industryIdentifiers[i].type === 'ISBN_10') {
+              isbn10 = book.volumeInfo.industryIdentifiers[i].identifier;
+            } else if (
+              book.volumeInfo.industryIdentifiers[i].type === 'ISBN_13'
+            ) {
+              isbn13 = book.volumeInfo.industryIdentifiers[i].identifier;
+            }
+          }
+        }
         return {
           googleId: book.id,
           title: book.volumeInfo.title,
           authors: book.volumeInfo.authors
             ? book.volumeInfo.authors.join(', ')
             : '',
+          publisher: book.volumeInfo.publisher ? book.volumeInfo.publisher : '',
+          publishedDate: book.volumeInfo.publishedDate
+            ? book.volumeInfo.publishedDate
+            : '',
+          description: book.volumeInfo.description
+            ? book.volumeInfo.description
+            : '',
+          pageCount: book.volumeInfo.pageCount ? book.volumeInfo.pageCount : '',
+          categories: book.volumeInfo.categories
+            ? book.volumeInfo.categories.join(', ')
+            : '',
+          thumbnail: book.volumeInfo.imageLinks.thumbnail
+            ? book.volumeInfo.imageLinks.thumbnail
+            : '',
+          smallThumbnail: book.volumeInfo.imageLinks.smallThumbnail
+            ? book.volumeInfo.imageLinks.smallThumbnail
+            : '',
+          language: book.volumeInfo.language ? book.volumeInfo.language : '',
+          webReaderLink: book.accessInfo.webReaderLink
+            ? book.accessInfo.webReaderLink
+            : '',
+          textSnippet:
+            book.searchInfo && book.searchInfo.textSnippet
+              ? book.searchInfo.textSnippet
+              : '',
+          buyLink:
+            book.saleInfo && book.saleInfo.buyLink ? book.saleInfo.buyLink : '',
+          publicDomain:
+            book.accessInfo && book.accessInfo.publicDomain
+              ? book.accessInfo.publicDomain
+              : false,
+          averageRating:
+            book.volumeInfo && book.volumeInfo.averageRating
+              ? book.volumeInfo.averageRating
+              : null,
+          isbn10: isbn10,
+          isbn13: isbn13,
         };
       });
       res.status(200).json({
