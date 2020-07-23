@@ -1,6 +1,7 @@
 const express = require('express');
 // const authRequired = require('../middleware/authRequired');
 const shelfBookConnections = require('../models/shelfBookConnectionModel');
+const Shelves = require('../models/shelfModel');
 const router = express.Router();
 
 router.get('/', function (req, res) {
@@ -36,6 +37,37 @@ router.get('/:id', function (req, res) {
         error: err.message,
       });
     });
+});
+
+// To GET the shelf-book connections for a specified shelf
+
+router.get('/shelf/:shelfId', function (req, res) {
+  const ShelfId = String(req.params.shelfId);
+  Shelves.findById(ShelfId).then((shelfResponse) => {
+    if (shelfResponse) {
+      shelfBookConnections
+        .findBy({ ShelfId })
+        .then((connections) => {
+          if (connections) {
+            res.status(200).json(connections);
+          } else {
+            res.status(404).json({
+              error: `Shelf-book connections where ShelfId is ${ShelfId} are not found.`,
+            });
+          }
+        })
+        .catch((err) => {
+          res.status(500).json({
+            message: `Failure to GET shelf-book connections where ShelfId is ${ShelfId}.`,
+            error: err.message,
+          });
+        });
+    } else {
+      res.status(404).json({
+        error: `Shelf with ShelfId ${ShelfId} was not found.`,
+      });
+    }
+  });
 });
 
 router.post('/:shelfId/:profileBookConnectionId', (req, res) => {
