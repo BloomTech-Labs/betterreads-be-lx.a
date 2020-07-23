@@ -12,14 +12,12 @@ router.get('/', (req, res) => {
     .then((response) => {
       const first_ten = response.data.items.slice(0, 10);
       const first_ten_parsed = first_ten.map((book) => {
-        let authors_formatted = '';
-        if (book.volumeInfo.authors) {
-          authors_formatted = book.volumeInfo.authors.join(', ');
-        }
         return {
           googleId: book.id,
           title: book.volumeInfo.title,
-          authors: authors_formatted,
+          authors: book.volumeInfo.authors
+            ? book.volumeInfo.authors.join(', ')
+            : '',
         };
       });
       res.status(200).json({
