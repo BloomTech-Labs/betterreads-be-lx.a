@@ -23,6 +23,7 @@ const profileRouter = require('./routes/profile');
 const bookRouter = require('./routes/books');
 const connectionRouter = require('./routes/profileBookConnections');
 const shelfRouter = require('./routes/shelves');
+const shelfBookConnectionRouter = require('./routes/shelfBookConnections');
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use(['/profile', '/profiles'], profileRouter);
 app.use(['/book', '/books'], bookRouter);
 app.use('/connect', connectionRouter);
 app.use(['/shelf', '/shelves'], shelfRouter);
+app.use('/organize', shelfBookConnectionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
