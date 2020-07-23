@@ -33,20 +33,29 @@ The following libraries have been used to serve the swagger docs live.
 
 ### Enviornment Variables
 
-`PORT` - API port
-`DATABASE_URL` - connection string for postgres database
-`OKTA_URL_ISSUER` - The complete issuer URL for verifying okta access tokens. `https://example.okta.com/oauth2/default`
-`OKTA_CLIENT_ID` - the okta client ID.
+- `PORT` - API port
+- `DATABASE_URL` - connection string for postgres database
+- `OKTA_URL_ISSUER` - The complete issuer URL for verifying okta access tokens. `https://example.okta.com/oauth2/default`
+- `OKTA_CLIENT_ID` - the okta client ID.
 
 See .env.sample for example values
 
 ### Setup postgres
 
-- Install [docker](https://docs.docker.com/get-docker/) for your platform
-  - Alternatively, for the older Windows 10 Home edition you have the following options
-    1. Install Postgress directly on your computer from [Download page](https://www.postgresql.org/download/)
-    2. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and Docker. This has many more steps involved up front but will get you a docker setup that can be used in the future
-- run: `docker-compose up` to start up the postgresql database.
+There are 2 methods to get postgresql installed locally:
+
+1. Use docker. [Install](https://docs.docker.com/get-docker/) for your platform
+    - run: `docker-compose up -d` to start up the postgresql database and pgadmin.
+    - Open a browser to [pgadmin](http://localhost:5050/) and you should see the Dev server already defined.
+2. Download and install postgresql directly from the [main site](https://www.postgresql.org/download/)
+    - make note of the port, username and password you use to setup the database.
+    - Connect your client to the server manually using the values previously mentioned
+    - You will need to create a database manually using a client.
+    - Make sure to update the DATABASE_URL connection string with the values for username/password, databasename and server port (if not 5432).
+3. Setup a free account at [ElephantSQL](https://www.elephantsql.com/plans.html)
+    - Sign up for a free `Tiney Turtle` plan
+    - copy the URL to the DATABASE_URL .env variable
+    - make sure to add `?ssl=true` to the end of this url
 
 ### Setup the application
 
@@ -56,16 +65,16 @@ See .env.sample for example values
   - Alternatively you can clone this repo then remove the git folder to initialize a new repo
 
     ```bash
-    > git clone --depth=1 --branch=master git@github.com:Lambda-School-Labs/labs-api-starter.git NEW-REPO-NAME
+    > git clone --depth=1 --branch=main git@github.com:Lambda-School-Labs/labs-api-starter.git NEW-REPO-NAME
     > rm -rf ./NEW-REPO-NAME/.git
     ```
 
 - run: `npm install` to download all dependencies.
 - run: `cp .env.sample .env` and update the enviornment variables to match your local setup.
-- run: `npm run knex -- migrate:latest` to create the starting schema.
-- run: `npm run knex -- seed:run` to populate your db with some data.
+- run: `npm run knex migrate:latest` to create the starting schema.
+- run: `npm run knex seed:run` to populate your db with some data.
 - run: `npm run tests` to confirm all is setup and tests pass.
-- run: `npm watch:dev` to start nodemon in local dev enviornment.
+- run: `npm run watch:dev` to start nodemon in local dev enviornment.
 
 ## Contributing
 
