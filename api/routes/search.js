@@ -39,32 +39,55 @@ router.get('/', (req, res) => {
           }
         }
         return {
-          googleId: book.id,
-          title: book.volumeInfo.title,
-          authors: book.volumeInfo.authors
-            ? book.volumeInfo.authors.join(', ')
-            : '',
-          publisher: book.volumeInfo.publisher ? book.volumeInfo.publisher : '',
-          publishedDate: book.volumeInfo.publishedDate
-            ? book.volumeInfo.publishedDate
-            : '',
-          description: book.volumeInfo.description
-            ? book.volumeInfo.description
-            : '',
-          pageCount: book.volumeInfo.pageCount ? book.volumeInfo.pageCount : '',
-          categories: book.volumeInfo.categories
-            ? book.volumeInfo.categories.join(', ')
-            : '',
-          thumbnail: book.volumeInfo.imageLinks.thumbnail
-            ? book.volumeInfo.imageLinks.thumbnail
-            : '',
-          smallThumbnail: book.volumeInfo.imageLinks.smallThumbnail
-            ? book.volumeInfo.imageLinks.smallThumbnail
-            : '',
-          language: book.volumeInfo.language ? book.volumeInfo.language : '',
-          webReaderLink: book.accessInfo.webReaderLink
-            ? book.accessInfo.webReaderLink
-            : '',
+          googleId: book.id ? book.id : '',
+          title:
+            book.volumeInfo && book.volumeInfo.title
+              ? book.volumeInfo.title
+              : '',
+          authors:
+            book.volumeInfo && book.volumeInfo.authors
+              ? book.volumeInfo.authors.join(', ')
+              : '',
+          publisher:
+            book.volumeInfo && book.volumeInfo.publisher
+              ? book.volumeInfo.publisher
+              : '',
+          publishedDate:
+            book.volumeInfo && book.volumeInfo.publishedDate
+              ? book.volumeInfo.publishedDate
+              : '',
+          description:
+            book.volumeInfo && book.volumeInfo.description
+              ? book.volumeInfo.description
+              : '',
+          pageCount:
+            book.volumeInfo && book.volumeInfo.pageCount
+              ? book.volumeInfo.pageCount
+              : '',
+          categories:
+            book.volumeInfo && book.volumeInfo.categories
+              ? book.volumeInfo.categories.join(', ')
+              : '',
+          thumbnail:
+            book.volumeInfo &&
+            book.volumeInfo.imageLinks &&
+            book.volumeInfo.imageLinks.thumbnail
+              ? book.volumeInfo.imageLinks.thumbnail
+              : '',
+          smallThumbnail:
+            book.volumeInfo &&
+            book.volumeInfo.imageLinks &&
+            book.volumeInfo.imageLinks.smallThumbnail
+              ? book.volumeInfo.imageLinks.smallThumbnail
+              : '',
+          language:
+            book.volumeInfo && book.volumeInfo.language
+              ? book.volumeInfo.language
+              : '',
+          webReaderLink:
+            book.accessInfo && book.accessInfo.webReaderLink
+              ? book.accessInfo.webReaderLink
+              : '',
           textSnippet:
             book.searchInfo && book.searchInfo.textSnippet
               ? book.searchInfo.textSnippet
@@ -79,8 +102,8 @@ router.get('/', (req, res) => {
             book.volumeInfo && book.volumeInfo.averageRating
               ? book.volumeInfo.averageRating
               : null,
-          isbn10: isbn10,
-          isbn13: isbn13,
+          isbn10,
+          isbn13,
         };
       });
       res.status(200).json({
