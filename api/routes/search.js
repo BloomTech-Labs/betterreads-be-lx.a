@@ -10,8 +10,7 @@ router.get('/', (req, res) => {
   axios
     .get(query)
     .then((response) => {
-      const first_ten = response.data.items.slice(0, 10);
-      const first_ten_parsed = first_ten.map((book) => {
+      const firstTenParsed = response.data.items.map((book) => {
         return {
           googleId: book.id,
           title: book.volumeInfo.title,
@@ -21,7 +20,9 @@ router.get('/', (req, res) => {
         };
       });
       res.status(200).json({
-        first_ten: first_ten_parsed,
+        totalItems: response.data.totalItems,
+        returnedItemsLength: response.data.items.length,
+        firstTen: firstTenParsed,
       });
     })
     .catch((err) => {
