@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-// In request body, searchTerms, exactPhrase, or author is required.
-// startIndex and maxResults are optional.
+// In request body, one or more of the following must be present:
+//  searchTerms, exactPhrase, title, isbn, or author.
+// startIndex, maxResults, and exclude are optional.
 // Default maxResults is 10.
 // Default startIndex is 0.
 
@@ -21,6 +22,8 @@ router.get('/', (req, res) => {
   }
   const author = req.body.author;
   const title = req.body.title;
+  const isbn = req.body.isbn;
+  const exclude = req.body.exclude;
 
   let query = 'https://www.googleapis.com/books/v1/volumes?q=';
   if (searchTerms && exactPhrase) {
@@ -31,9 +34,16 @@ router.get('/', (req, res) => {
     query += exactPhrase;
   }
 
+  if (exclude) {
+    const excludeArray = exclude.split(' ');
+    for (let i = 0; i < excludeArray.length; i++) {
+      query += '-' + excludeArray[i];
+    }
+  }
+
   if (author) {
     const authorArray = author.split(' ');
-    if (!exactPhrase && !searchTerms && !title) {
+    if (!exactPhrase && !searchTerms && !title && !exclude && !isbn) {
       query += 'inauthor:' + authorArray[0];
       for (let i = 1; i < authorArray.length; i++) {
         query += '+inauthor:' + authorArray[i];
@@ -47,7 +57,7 @@ router.get('/', (req, res) => {
 
   if (title) {
     const titleArray = title.split(' ');
-    if (!exactPhrase && !searchTerms && !author) {
+    if (!exactPhrase && !searchTerms && !author && !exclude && !isbn) {
       query += 'intitle:' + titleArray[0];
       for (let i = 1; i < titleArray.length; i++) {
         query += '+intitle:' + titleArray[i];
@@ -59,16 +69,25 @@ router.get('/', (req, res) => {
     }
   }
 
+  if (isbn) {
+    if (!exactPhrase && !searchTerms && !author && !exclude) {
+      query += 'isbn:' + isbn;
+    } else {
+      query += '+isbn:' + isbn;
+    }
+  }
+
   if (startIndex) {
     query += '&startIndex=' + startIndex;
   }
+
   if (maxResults > 40) {
     maxResults = 40;
   }
   if (maxResults) {
     query += '&maxResults=' + maxResults;
   }
-  console.log(query);
+
   axios
     .get(query)
     .then((response) => {
