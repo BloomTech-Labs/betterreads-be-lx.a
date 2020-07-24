@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-// In request body, searchTerms or exactPhrase is required. startIndex and maxResults are optional.
+// In request body, searchTerms, exactPhrase, or author is required.
+// startIndex and maxResults are optional.
 // Default maxResults is 10.
 // Default startIndex is 0.
+
 router.get('/', (req, res) => {
   let searchTerms = req.body.searchTerms;
   if (searchTerms) {
@@ -18,6 +20,7 @@ router.get('/', (req, res) => {
     exactPhrase = '"' + exactPhrase.replace(/ /g, '+') + '"';
   }
   const author = req.body.author;
+  const title = req.body.title;
 
   let query = 'https://www.googleapis.com/books/v1/volumes?q=';
   if (searchTerms && exactPhrase) {
@@ -27,9 +30,10 @@ router.get('/', (req, res) => {
   } else if (exactPhrase) {
     query += exactPhrase;
   }
+
   if (author) {
     const authorArray = author.split(' ');
-    if (!exactPhrase && !searchTerms) {
+    if (!exactPhrase && !searchTerms && !title) {
       query += 'inauthor:' + authorArray[0];
       for (let i = 1; i < authorArray.length; i++) {
         query += '+inauthor:' + authorArray[i];
@@ -40,6 +44,21 @@ router.get('/', (req, res) => {
       }
     }
   }
+
+  if (title) {
+    const titleArray = title.split(' ');
+    if (!exactPhrase && !searchTerms && !author) {
+      query += 'intitle:' + titleArray[0];
+      for (let i = 1; i < titleArray.length; i++) {
+        query += '+intitle:' + titleArray[i];
+      }
+    } else {
+      for (let i = 0; i < titleArray.length; i++) {
+        query += '+intitle:' + titleArray[i];
+      }
+    }
+  }
+
   if (startIndex) {
     query += '&startIndex=' + startIndex;
   }
