@@ -2,15 +2,44 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-// In request body, query is required. startIndex and maxResults are optional.
+// In request body, searchTerms or exactPhrase is required. startIndex and maxResults are optional.
 // Default maxResults is 10.
 // Default startIndex is 0.
 router.get('/', (req, res) => {
-  let queryBody = req.body.query;
+  let searchTerms = req.body.searchTerms;
+  if (searchTerms) {
+    searchTerms = searchTerms.replace(/ /g, '+');
+  }
+
   const startIndex = req.body.startIndex;
   let maxResults = req.body.maxResults;
-  queryBody = queryBody.replace(/ /g, '+');
-  let query = 'https://www.googleapis.com/books/v1/volumes?q=' + queryBody;
+  let exactPhrase = req.body.exactPhrase;
+  if (exactPhrase) {
+    exactPhrase = '"' + exactPhrase.replace(/ /g, '+') + '"';
+  }
+  const author = req.body.author;
+
+  let query = 'https://www.googleapis.com/books/v1/volumes?q=';
+  if (searchTerms && exactPhrase) {
+    query += exactPhrase + '+' + searchTerms;
+  } else if (searchTerms) {
+    query += searchTerms;
+  } else if (exactPhrase) {
+    query += exactPhrase;
+  }
+  if (author) {
+    const authorArray = author.split(' ');
+    if (!exactPhrase && !searchTerms) {
+      query += 'inauthor:' + authorArray[0];
+      for (let i = 1; i < authorArray.length; i++) {
+        query += '+inauthor:' + authorArray[i];
+      }
+    } else {
+      for (let i = 0; i < authorArray.length; i++) {
+        query += '+inauthor:' + authorArray[i];
+      }
+    }
+  }
   if (startIndex) {
     query += '&startIndex=' + startIndex;
   }
@@ -114,7 +143,7 @@ router.get('/', (req, res) => {
     })
     .catch((err) => {
       res.status(500).json({
-        message: `Failure to get Google Books API result with ${queryBody}`,
+        message: 'Failure to get Google Books API result.',
         error: err.message,
       });
     });
