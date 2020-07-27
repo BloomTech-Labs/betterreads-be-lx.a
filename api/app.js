@@ -21,6 +21,10 @@ const swaggerUIOptions = {
 const indexRouter = require('./routes/index');
 const profileRouter = require('./routes/profile');
 const bookRouter = require('./routes/books');
+const connectionRouter = require('./routes/profileBookConnections');
+const shelfRouter = require('./routes/shelves');
+const shelfBookConnectionRouter = require('./routes/shelfBookConnections');
+const searchRouter = require('./routes/search');
 
 const app = express();
 
@@ -50,6 +54,11 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use(['/profile', '/profiles'], profileRouter);
 app.use(['/book', '/books'], bookRouter);
+app.use('/connect', connectionRouter);
+app.use(['/shelf', '/shelves'], shelfRouter);
+app.use('/organize', shelfBookConnectionRouter);
+app.use('/search', searchRouter);
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
@@ -64,7 +73,7 @@ app.use(function (err, req, res, next) {
       res.locals.error = err;
     }
   }
-  console.error(err);
+  // console.error(err); // When uncommented, this line throws an error when running tests. "not found"
   if (process.env.NODE_ENV === 'production' && !res.locals.message) {
     res.locals.message = 'ApplicationError';
     res.locals.status = 500;

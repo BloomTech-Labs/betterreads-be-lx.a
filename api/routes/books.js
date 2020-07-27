@@ -3,6 +3,53 @@ const express = require('express');
 const Books = require('../models/bookModel');
 const router = express.Router();
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Book:
+ *      type: object
+ *      required:
+ *        - googleId
+ *        - title
+ *        - authors
+ *      properties:
+ *        googleId:
+ *          type: string
+ *          description: google books API id
+ *        title:
+ *          type: string
+ *        authors:
+ *          type: string
+ *      example:
+ *        googleId: 'hFfhrCWiLSMC'
+ *        title: 'The Hobbit, Or, There and Back Again'
+ *        authors: 'John Ronald Reuel Tolkien'
+ *
+ * /books:
+ *  get:
+ *    description: Returns a list of books
+ *    summary: Get a list of all books
+ *    tags:
+ *      - book
+ *    responses:
+ *      200:
+ *        description: array of books
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Book'
+ *              example:
+ *                - googleId: 'hFfhrCWiLSMC'
+ *                  title: 'The Hobbit, Or, There and Back Again'
+ *                  authors: 'John Ronald Reuel Tolkien'
+ *                - googleId: '5QRZ4z6A1WwC'
+ *                  title: 'The Fellowship of the Ring'
+ *                  authors: 'John Ronald Reuel Tolkien and Alan Lee'
+ */
+
 router.get('/', function (req, res) {
   Books.findAll()
     .then((books) => {
@@ -39,11 +86,9 @@ router.post('/', (req, res) => {
         if (br == undefined) {
           //book not found so lets insert it
           Books.create(book)
-            .then((book) =>
-              res
-                .status(200)
-                .json({ message: 'book created', profile: book[0] })
-            )
+            .then((book) => {
+              res.status(200).json({ message: 'book created', book: book });
+            })
             .catch((err) => {
               console.error(err);
               res.status(500).json({ message: err.message });
