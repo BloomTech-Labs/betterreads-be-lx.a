@@ -70,73 +70,57 @@ router.get('/shelf/:shelfId', function (req, res) {
   });
 });
 
-router.post('/:shelfId/:profileBookConnectionId', (req, res) => {
+router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
   const ShelfId = String(req.params.shelfId);
   const ConnectionId = String(req.params.profileBookConnectionId);
-  shelfBookConnections
-    .findBy({ ShelfId, ConnectionId })
-    .first()
-    .then((connectionResult) => {
-      if (connectionResult == undefined) {
-        // shelf-book connection not found, so let's create it:
-        shelfBookConnections
-          .create({ ShelfId, ConnectionId })
-          .then((newConnection) => {
-            res.status(200).json({
-              message: 'shelf-book connection created',
-              connection: newConnection,
+
+  try {
+    await shelfBookConnections
+      .findBy({ ShelfId, ConnectionId })
+      .first()
+      .then(async (connectionResult) => {
+        if (connectionResult == undefined) {
+          // shelf-book connection not found, so let's create it:
+          await shelfBookConnections
+            .create({ ShelfId, ConnectionId })
+            .then((newConnection) => {
+              res.status(200).json({
+                message: 'shelf-book connection created',
+                connection: newConnection,
+              });
             });
-          })
-          .catch((err) => {
-            console.error(err);
-            res.status(500).json({
-              message: 'Failure to create new shelf-book connection',
-              error: err.message,
-            });
+        } else {
+          res.status(400).json({
+            message: `shelf-book connection with id ${connectionResult.id} already exists`,
           });
-      } else {
-        res.status(400).json({
-          message: `shelf-book connection with id ${connectionResult.id} already exists`,
-        });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: err.message });
-    });
+        }
+      });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
-  shelfBookConnections
-    .findById(id)
-    .then((connection) => {
+
+  try {
+    shelfBookConnections.findById(id).then(async (connection) => {
       if (connection) {
-        shelfBookConnections
-          .remove(id)
-          .then((deleted) => {
-            res.status(200).json({
-              message: `Shelf-book connection with id ${id} was deleted.`,
-              count_of_deleted_connections: deleted,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              message: `Could not delete shelf-book connection with id: ${id}`,
-              error: err.message,
-            });
+        await shelfBookConnections.remove(id).then((deleted) => {
+          res.status(200).json({
+            message: `Shelf-book connection with id ${id} was deleted.`,
+            count_of_deleted_connections: deleted,
           });
+        });
       } else {
         res.status(404).json({
           error: `Shelf-book connection with id ${id} not found.`,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `Shelf-book connection with id ${id} not found.`,
-        error: err.message,
-      });
     });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
+
 module.exports = router;

@@ -159,7 +159,7 @@ router.get('/:id', authRequired, function (req, res) {
  *                profile:
  *                  $ref: '#/components/schemas/Profile'
  */
-router.post('/', async (req, res) => {
+router.post('/', authRequired, async (req, res) => {
   const profile = req.body;
   if (profile) {
     const id = profile.id || 0;
@@ -177,7 +177,6 @@ router.post('/', async (req, res) => {
         }
       });
     } catch (e) {
-      console.error(e);
       res.status(500).json({ message: e.message });
     }
   } else {
