@@ -53,7 +53,7 @@ const router = express.Router();
  *        personalRating: 5.0
  *
  *  /connect:
- *  get:
+ *   get:
  *    description: Returns a list of profile-book connections
  *    summary: Get a list of all profile-book connections
  *    tags:
@@ -152,6 +152,55 @@ router.get('/:id', function (req, res) {
 });
 
 // To only GET the connections for a specified user
+
+/**
+ * @swagger
+ * components:
+ *  parameters:
+ *    id:
+ *      name: id
+ *      in: path
+ *      description: ID of the profile
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ *
+ * /connect/profile/{id}:
+ *  get:
+ *    description: Find profile-book connections for a specified user
+ *    summary: Returns profile-book connections for a specified user
+ *    tags:
+ *      - profileBookConnections
+ *    parameters:
+ *      - $ref: '#/components/parameters/id'
+ *    responses:
+ *      200:
+ *        description: array of profile-book connections
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ProfileBookConnections'
+ *              example:
+ *                - id: 1
+ *                  profileId: 1
+ *                  bookId: 1
+ *                  readingStatus: 3
+ *                  dateStarted: "2015-01-04T02:14:06.585Z"
+ *                  dateFinished: "2015-02-02T03:15:08.450Z"
+ *                  dateAdded: "2014-01-01T05:38:18.365Z"
+ *                  favorite: true
+ *                  personalRating: 5.0
+ *                - id: 7
+ *                  profileId: 1
+ *                  bookId: 3
+ *      404:
+ *        description: 'Profile-book connections with profile id ${profileId} not found.'
+ *      500:
+ *        description: 'Failure to GET profile-book connections with profile id ${profileId}.'
+ */
 
 router.get('/profile/:id', function (req, res) {
   const profileId = String(req.params.id);
