@@ -3,6 +3,56 @@ const express = require('express');
 const Connections = require('../models/profileBookConnectionModel');
 const router = express.Router();
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    ProfileBookConnections:
+ *      type: object
+ *      required:
+ *        - id
+ *        - profileId
+ *        - bookId
+ *        - readingStatus
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: auto-generated id
+ *        profileId:
+ *          type: integer
+ *          description: id of user
+ *        bookId:
+ *          type: integer
+ *          description: id of book
+ *        readingStatus:
+ *          type: integer
+ *          description: integer representing reading status. Look up in readingOptions table.
+ *        dateStarted:
+ *          type: datetime
+ *          description: when user started reading book
+ *        dateFinished:
+ *          type: datetime
+ *          description: when user finished reading book
+ *        dateAdded:
+ *          type: datetime
+ *          description: when connection was created
+ *        favorite:
+ *          type: boolean
+ *          description: whether or not user considers book to be a favorite
+ *        personalRating:
+ *          type: decimal
+ *          description: user's rating between 0-5
+ *      example:
+ *        profileId: 1
+ *        bookId: 1
+ *        readingStatus: 3
+ *        dateStarted: '2015-01-01'
+ *        dateFinished: '2015-02-01'
+ *        dateAdded: '2014-01-01'
+ *        favorite: true
+ *        personalRating: 5.0
+ */
+
 router.get('/', function (req, res) {
   Connections.findAll()
     .then((connections) => {
@@ -61,6 +111,7 @@ router.get('/profile/:id', function (req, res) {
 // Required in request body: profileId, bookId, and readingStatus (an integer, 1-3)
 router.post('/', (req, res) => {
   const connection = req.body;
+  console.log(connection);
   if (connection) {
     const profileId = connection.profileId || 0;
     const bookId = connection.bookId || 0;

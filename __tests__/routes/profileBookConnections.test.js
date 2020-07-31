@@ -68,4 +68,37 @@ describe('profile-book router endpoints', () => {
       expect(Connections.findBy.mock.calls.length).toBe(1);
     });
   });
+
+  describe('POST /connect', () => {
+    it('should return 200 when profile-book connection is created', async () => {
+      const connection = {
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.findById.mockResolvedValue(undefined);
+      Connections.create.mockResolvedValue([
+        Object.assign({ id: 122 }, connection),
+      ]);
+      const res = await request(server).post('/connect').send(connection);
+
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe('profile-book connection created');
+      expect(res.status).toBe(200);
+      expect(res.body.connection.id).toBe(122);
+      expect(Connections.create.mock.calls.length).toBe(1);
+    });
+  });
+  it('should return 400 when profile-book connection is missing in request body', async () => {
+    Connections.findById.mockResolvedValue(undefined);
+    Connections.create.mockResolvedValue();
+    const res = await request(server).post('/connect').send();
+
+    expect(res.body.message).toBeTruthy();
+    expect(res.body.message).toBe(
+      'Failure to create profile-book connection because info is missing in request body.'
+    );
+    expect(res.status).toBe(400);
+    expect(Connections.create.mock.calls.length).toBe(0);
+  });
 });
