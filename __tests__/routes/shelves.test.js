@@ -1,5 +1,6 @@
 const request = require('supertest');
 const express = require('express');
+const sinon = require('sinon');
 const Shelves = require('../../api/models/shelfModel');
 const shelfRouter = require('../../api/routes/shelves');
 const server = express();
@@ -19,6 +20,18 @@ describe('shelves router endpoints', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(0);
+      expect(Shelves.findAll.mock.calls.length).toBe(1);
+    });
+
+    it('should return 500 on error', async () => {
+      sinon
+        .stub(Shelves, 'findAll')
+        .rejects({ message: 'Error getting shelves from db' });
+
+      const res = await request(server).get('/shelves');
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBe('Error getting shelves from db');
       expect(Shelves.findAll.mock.calls.length).toBe(1);
     });
   });
@@ -44,6 +57,16 @@ describe('shelves router endpoints', () => {
 
       expect(res.status).toBe(404);
       expect(res.body.error).toBe('ShelfNotFound');
+    });
+
+    it('should return 500 on error', async () => {
+      sinon.stub(Shelves, 'findById').rejects({ message: 'DB error' });
+
+      const res = await request(server).get('/shelves/20');
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBe('DB error');
+      expect(Shelves.findAll.mock.calls.length).toBe(1);
     });
   });
 });

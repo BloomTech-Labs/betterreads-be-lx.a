@@ -4,17 +4,97 @@ const Shelves = require('../models/shelfModel');
 const Profiles = require('../models/profileModel');
 const router = express.Router();
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Shelf:
+ *      type: object
+ *      required:
+ *        - id
+ *        - name
+ *        - profileId
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: Shelf id
+ *        name:
+ *          type: string
+ *        profileId:
+ *          type: integer
+ *      example:
+ *        id: 1
+ *        name: "Book Club"
+ *        profileId: 1
+ *
+ * /shelves:
+ *  get:
+ *    description: Returns a list of shelves
+ *    summary: Get a list of all shelves
+ *    tags:
+ *      - shelf
+ *    responses:
+ *      200:
+ *        description: array of shelves
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Shelf'
+ *              example:
+ *                - id: 1
+ *                  name: "Book Club"
+ *                  profileId: 1
+ *                - id: 2
+ *                  name: "Owned"
+ *                  profileId: 1
+ */
 router.get('/', function (req, res) {
   Shelves.findAll()
     .then((shelves) => {
       res.status(200).json(shelves);
     })
     .catch((err) => {
-      console.log(err);
+      // console.error(err);
       res.status(500).json({ message: err.message });
     });
 });
 
+/**
+ * @swagger
+ * components:
+ *  parameters:
+ *    shelfId:
+ *      name: id
+ *      in: path
+ *      description: ID of the shelf to return
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: string
+ * /shelves/{id}:
+ *  get:
+ *    description: Returns a list of shelves
+ *    summary: Get a list of all shelves
+ *    tags:
+ *      - shelf
+ *    parameters:
+ *      - $ref: '#/components/parameters/shelfId'
+ *    responses:
+ *      200:
+ *        description: shelf object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              items:
+ *                $ref: '#/components/schemas/Shelf'
+ *              example:
+ *                  id: 1
+ *                  name: "Book Club"
+ *                  profileId: 1
+ */
 router.get('/:id', function (req, res) {
   const id = String(req.params.id);
   Shelves.findById(id)
@@ -26,14 +106,49 @@ router.get('/:id', function (req, res) {
       }
     })
     .catch((err) => {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message });
     });
 });
 
-// GET all shelves of specified user only
-
-router.get('/profile/:id', function (req, res) {
-  const profileId = String(req.params.id);
+/**
+ * @swagger
+ * components:
+ *  parameters:
+ *    userId:
+ *      name: userId
+ *      in: path
+ *      description: ID of the user profile
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: string
+ * /shelves/profile/{userId}:
+ *  get:
+ *    description: Returns a list of shelves for a specific user
+ *    summary: Get a list of users shelves
+ *    tags:
+ *      - shelf
+ *    parameters:
+ *      - $ref: '#/components/parameters/userId'
+ *    responses:
+ *      200:
+ *        description: array of shelf objects
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Shelf'
+ *              example:
+ *                - id: 1
+ *                  name: "Book Club"
+ *                  profileId: 1
+ *                - id: 2
+ *                  name: "Owned"
+ *                  profileId: 1
+ */
+router.get('/profile/:userId', function (req, res) {
+  const profileId = String(req.params.userId);
   // First, check that profileId is for a valid user
   Profiles.findById(profileId)
     .then((pr) => {
@@ -64,6 +179,33 @@ router.get('/profile/:id', function (req, res) {
     });
 });
 
+/**
+ * @swagger
+ * /shelves:
+ *  post:
+ *    description: Create a new shelf
+ *    summary: Get a list of users shelves
+ *    tags:
+ *      - shelf
+ *    parameters:
+ *      - $ref: '#/components/parameters/userId'
+ *    responses:
+ *      200:
+ *        description: array of shelf objects
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Shelf'
+ *              example:
+ *                - id: 1
+ *                  name: "Book Club"
+ *                  profileId: 1
+ *                - id: 2
+ *                  name: "Owned"
+ *                  profileId: 1
+ */
 router.post('/', (req, res) => {
   const shelf = req.body;
   if (shelf) {
