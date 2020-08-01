@@ -305,8 +305,8 @@ router.post('/', (req, res) => {
 
 /**
  * @swagger
- *  components:
- *   parameters:
+ * components:
+ *  parameters:
  *    id:
  *      name: id
  *      in: path
@@ -328,8 +328,10 @@ router.post('/', (req, res) => {
  *          schema:
  *            $ref: '#/components/schemas/ProfileBookConnections'
  *    responses:
- *      404:
- *        $ref: '#/components/responses/NotFound'
+ *      500:
+ *        description: Failure to update profile-book connection with id ${id}
+ *      400:
+ *        description: Failure to update because profile-book connection with id ${id} not found, or because info is missing in request body.
  *      200:
  *        description: An object containing a message and a profile-book connection object
  *        content:
