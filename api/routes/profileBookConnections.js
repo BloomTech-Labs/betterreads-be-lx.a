@@ -61,7 +61,7 @@ const router = express.Router();
  *    description: Returns a list of profile-book connections
  *    summary: Get a list of all profile-book connections
  *    tags:
- *      - profileBookConnnections
+ *      - profileBookConnections
  *    responses:
  *      200:
  *        description: array of profile-book connections
