@@ -52,6 +52,10 @@ const router = express.Router();
  *        favorite: true
  *        personalRating: 5.0
  *
+ */
+
+/**
+ * @swagger
  *  /connect:
  *   get:
  *    description: Returns a list of profile-book connections
@@ -221,6 +225,39 @@ router.get('/profile/:id', function (req, res) {
       });
     });
 });
+
+/**
+ * @swagger
+ * /connect:
+ *  post:
+ *    summary: Add a profile-book connection
+ *    tags:
+ *      - profileBookConnections
+ *    requestBody:
+ *      description: Profile-book connection object to to be added
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/ProfileBookConnections'
+ *    responses:
+ *      400:
+ *        $ref: '#/components/responses/BadRequest'
+ *      401:
+ *        $ref: '#/components/responses/UnauthorizedError'
+ *      200:
+ *        description: An object containing both a message and a profile-book connection object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the result
+ *                  example: 'profile-book connection created'
+ *                connection:
+ *                  $ref: '#/components/schemas/ProfileBookConnections'
+ */
 
 // Required in request body: profileId, bookId, and readingStatus (an integer, 1-3)
 router.post('/', (req, res) => {
