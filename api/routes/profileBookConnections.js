@@ -303,6 +303,48 @@ router.post('/', (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ *  components:
+ *   parameters:
+ *    id:
+ *      name: id
+ *      in: path
+ *      description: ID of the profile-book connection to update
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ *
+ * /connect/{id}:
+ *  put:
+ *    summary: Update a profile-book connection
+ *    tags:
+ *      - profileBookConnections
+ *    requestBody:
+ *      description: Profile-book connection object to to be updated
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/ProfileBookConnections'
+ *    responses:
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ *      200:
+ *        description: An object containing a message and a profile-book connection object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the result
+ *                  example: 'Profile-book connection with id ${id} is updated.'
+ *                profile:
+ *                  $ref: '#/components/schemas/ProfileBookConnections'
+ */
+
 router.put('/:id', (req, res) => {
   const id = String(req.params.id);
   const connectionInfo = req.body;
