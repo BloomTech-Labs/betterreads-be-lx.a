@@ -240,10 +240,10 @@ router.get('/profile/:id', function (req, res) {
  *          schema:
  *            $ref: '#/components/schemas/ProfileBookConnections'
  *    responses:
+ *      500:
+ *        description: 'Failure to create new profile-book connection'
  *      400:
- *        $ref: '#/components/responses/BadRequest'
- *      401:
- *        $ref: '#/components/responses/UnauthorizedError'
+ *        description: 'Failure because connection between profile and user already exists, or because info is missing from request body'
  *      200:
  *        description: An object containing both a message and a profile-book connection object
  *        content:
