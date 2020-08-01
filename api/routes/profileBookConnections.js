@@ -385,6 +385,34 @@ router.put('/:id', (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /connect/{id}:
+ *  delete:
+ *    summary: Remove a profile-book connection
+ *    tags:
+ *      - profileBookConnections
+ *    parameters:
+ *      - $ref: '#/components/parameters/id'
+ *    responses:
+ *      404:
+ *        $ref: '#/components/responses/NotFound'
+ *      200:
+ *        description: An object containing a message and count of connections deleted
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the result
+ *                  example: 'Profile-book connection with id ${id} was deleted.'
+ *                count_of_deleted_connections::
+ *                  description: The count of profile-book connections deleted.
+ *                  example: 1
+ */
+
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   Connections.findById(id)
