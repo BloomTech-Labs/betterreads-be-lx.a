@@ -290,7 +290,6 @@ router.post('/', async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   } else {
-    console.log('in else');
     res.status(400).json({
       message:
         'Failure to create profile-book connection because info is missing in request body.',
@@ -342,40 +341,39 @@ router.post('/', async (req, res) => {
  *                  $ref: '#/components/schemas/ProfileBookConnections'
  */
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const id = String(req.params.id);
   const connectionInfo = req.body;
-  if (connectionInfo) {
-    Connections.findById(id)
-      .then((connectionResponse) => {
+  if (!isEmpty(connectionInfo)) {
+    console.log('connectionInfo: ', connectionInfo);
+    try {
+      await Connections.findById(id).then(async (connectionResponse) => {
         if (connectionResponse == undefined) {
           res.status(400).json({
             message: `Profile-book connection with id ${id} not found.`,
           });
         } else {
-          Connections.update(id, connectionInfo)
-            .then((updatedConnection) => {
+          await Connections.update(id, connectionInfo).then(
+            async (updatedConnection) => {
               res.status(200).json({
                 message: `Profile-book connection with id ${id} is updated.`,
                 connection: updatedConnection,
               });
-            })
-            .catch((err) => {
-              res.status(500).json({
-                message: `Failure to update profile-book connection with id ${id}`,
-                error: err.message,
-              });
-            });
+            }
+          );
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({ message: err.message });
       });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: err.message,
+        message: `Failure to update profile-book connection with id ${id}`,
+      });
+    }
   } else {
     res.status(400).json({
       message:
-        'Request body is missing the connection info needed for an update.',
+        'Failure to update profile-book connection because request body is missing.',
     });
   }
 });
@@ -439,5 +437,15 @@ router.delete('/:id', (req, res) => {
       });
     });
 });
+
+// Helper function to detect with an object is empty
+function isEmpty(obj) {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 module.exports = router;

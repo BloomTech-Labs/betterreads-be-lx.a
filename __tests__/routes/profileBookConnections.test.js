@@ -130,4 +130,32 @@ describe('profile-book router endpoints', () => {
     expect(res.status).toBe(400);
     expect(Connections.create.mock.calls.length).toBe(1);
   });
+
+  /*
+  describe('PUT /connect/:id', () => {
+    it('should return 200 when profile-book connection is successfully modified', async () => {
+      const connection = {
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.duplicateCheck.mockResolvedValue(undefined);
+      Connections.create.mockResolvedValue(
+        Object.assign({ id: 122 }, connection)
+      );
+      const res = await request(server).post('/connect/122').send(connection);
+
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe('profile-book connection created');
+      expect(res.status).toBe(200);
+      expect(res.body.connection).toBeTruthy();
+      expect(res.body.connection.id).toBe(122);
+      expect(res.body.connection.profileId).toBe(11);
+      expect(res.body.connection.bookId).toBe(2);
+      expect(res.body.connection.readingStatus).toBe(2);
+      expect(Connections.duplicateCheck.mock.calls.length).toBe(1);
+      expect(Connections.create.mock.calls.length).toBe(1);
+    });
+  });
+  */
 });
