@@ -173,6 +173,21 @@ describe('profile-book router endpoints', () => {
       expect(Connections.update.mock.calls.length).toBe(1);
     });
 
+    it('should return 400 when profile-book connection is not successfully modified because profile-book connection is not found', async () => {
+      const requestBody = {
+        favorite: true,
+      };
+      Connections.findById.mockResolvedValue(undefined);
+      const res = await request(server).put('/connect/122').send(requestBody);
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to update profile-book connection because profile-book connection with id 122 was not found.'
+      );
+      expect(Connections.findById.mock.calls.length).toBe(4);
+      expect(Connections.update.mock.calls.length).toBe(1);
+    });
+
     it('should return 404 when profile-book connection is not successfully modified because profile-book connection id is missing', async () => {
       const requestBody = {
         favorite: true,
@@ -188,7 +203,7 @@ describe('profile-book router endpoints', () => {
       expect(res.error.text).toEqual(
         expect.stringContaining('<title>Error</title>\n')
       );
-      expect(Connections.findById.mock.calls.length).toBe(3);
+      expect(Connections.findById.mock.calls.length).toBe(4);
       expect(Connections.update.mock.calls.length).toBe(1);
     });
   });
