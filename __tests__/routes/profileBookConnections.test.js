@@ -257,18 +257,46 @@ describe('profile-book router endpoints', () => {
       expect(Connections.update.mock.calls.length).toBe(2);
     });
   });
+
+  describe('DELETE /connect/:id', () => {
+    it('should return 200 when profile-book connection is successfully deleted', async () => {
+      const connection = {
+        id: 122,
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.findById.mockResolvedValue(connection);
+      Connections.remove.mockResolvedValue(1);
+      const res = await request(server).delete('/connect/122');
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Profile-book connection with id 122 was deleted.'
+      );
+      expect(res.body.count_of_deleted_connections).toBeTruthy();
+      expect(res.body.count_of_deleted_connections).toBe(1);
+
+      expect(Connections.findById.mock.calls.length).toBe(6);
+      expect(Connections.remove.mock.calls.length).toBe(1);
+    });
+
+    it('should return 404 when profile-book connection is not successfully deleted because profile-book connection was not found', async () => {
+      Connections.findById.mockResolvedValue(undefined);
+
+      const res = await request(server).delete('/connect/1222');
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Unable to delete profile-book connection because profile-book connection with id 1222 not found.'
+      );
+      expect(Connections.findById.mock.calls.length).toBe(7);
+      expect(Connections.remove.mock.calls.length).toBe(1);
+    });
+  });
 });
 
 /*
-{
-    "message": "Profile-book connection with id 14 was deleted.",
-    "count_of_deleted_connections": 1
-}
-
-{
-    "message": `Unable to delete profile-book connection because profile-book connection with id ${id} not found.`
-}
-
 {
     "message": `Failure to delete profile-book connection with id ${id}`,
     "error": "Cannot read property 'error' of undefined"
