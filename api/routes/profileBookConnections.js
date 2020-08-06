@@ -345,7 +345,6 @@ router.put('/:id', async (req, res) => {
   const id = String(req.params.id);
   const connectionInfo = req.body;
   if (!isEmpty(connectionInfo)) {
-    console.log('connectionInfo: ', connectionInfo);
     try {
       await Connections.findById(id).then(async (connectionResponse) => {
         if (connectionResponse == undefined) {

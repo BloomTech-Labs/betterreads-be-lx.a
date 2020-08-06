@@ -161,5 +161,24 @@ describe('profile-book router endpoints', () => {
       expect(Connections.findById.mock.calls.length).toBe(3);
       expect(Connections.update.mock.calls.length).toBe(1);
     });
+
+    it('should return 404 when profile-book connection is not successfully modified because profile-book connection id is missing', async () => {
+      const requestBody = {
+        favorite: true,
+      };
+
+      const res = await request(server).put('/connect/').send(requestBody);
+      expect(res.status).toBe(404);
+      expect(res.error).toBeTruthy();
+      expect(res.error.text).toBeTruthy();
+      expect(res.error.text).toEqual(
+        expect.stringContaining('<pre>Cannot PUT /connect/</pre>\n')
+      );
+      expect(res.error.text).toEqual(
+        expect.stringContaining('<title>Error</title>\n')
+      );
+      expect(Connections.findById.mock.calls.length).toBe(3);
+      expect(Connections.update.mock.calls.length).toBe(1);
+    });
   });
 });
