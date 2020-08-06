@@ -131,31 +131,35 @@ describe('profile-book router endpoints', () => {
     expect(Connections.create.mock.calls.length).toBe(1);
   });
 
-  /*
   describe('PUT /connect/:id', () => {
     it('should return 200 when profile-book connection is successfully modified', async () => {
+      const requestBody = {
+        favorite: true,
+      };
       const connection = {
+        id: 122,
         profileId: 11,
         bookId: 2,
         readingStatus: 2,
       };
-      Connections.duplicateCheck.mockResolvedValue(undefined);
-      Connections.create.mockResolvedValue(
-        Object.assign({ id: 122 }, connection)
-      );
-      const res = await request(server).post('/connect/122').send(connection);
+      const updatedConnection = Object.assign(requestBody, connection);
+      Connections.findById.mockResolvedValue(connection);
+      Connections.update.mockResolvedValue(updatedConnection);
+      const res = await request(server).put('/connect/122').send(requestBody);
 
       expect(res.body.message).toBeTruthy();
-      expect(res.body.message).toBe('profile-book connection created');
+      expect(res.body.message).toBe(
+        'Profile-book connection with id 122 is updated.'
+      );
       expect(res.status).toBe(200);
       expect(res.body.connection).toBeTruthy();
       expect(res.body.connection.id).toBe(122);
       expect(res.body.connection.profileId).toBe(11);
       expect(res.body.connection.bookId).toBe(2);
       expect(res.body.connection.readingStatus).toBe(2);
-      expect(Connections.duplicateCheck.mock.calls.length).toBe(1);
-      expect(Connections.create.mock.calls.length).toBe(1);
+      expect(res.body.connection.favorite).toBe(true);
+      expect(Connections.findById.mock.calls.length).toBe(3);
+      expect(Connections.update.mock.calls.length).toBe(1);
     });
   });
-  */
 });

@@ -350,7 +350,7 @@ router.put('/:id', async (req, res) => {
       await Connections.findById(id).then(async (connectionResponse) => {
         if (connectionResponse == undefined) {
           res.status(400).json({
-            message: `Profile-book connection with id ${id} not found.`,
+            message: `Failure to update profile-book connection because profile-book connection with id ${id} was not found.`,
           });
         } else {
           await Connections.update(id, connectionInfo).then(
@@ -372,8 +372,7 @@ router.put('/:id', async (req, res) => {
     }
   } else {
     res.status(400).json({
-      message:
-        'Failure to update profile-book connection because request body is missing.',
+      message: `Failure to update profile-book connection with id ${id} because request body is missing.`,
     });
   }
 });
