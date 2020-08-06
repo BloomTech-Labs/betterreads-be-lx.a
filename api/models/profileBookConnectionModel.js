@@ -12,6 +12,13 @@ const findById = async (id) => {
   return db('profile_book_connections').where({ id }).first().select('*');
 };
 
+const duplicateCheck = async (profileId, bookId) => {
+  return db('profile_book_connections')
+    .where({ profileId: profileId, bookId: bookId })
+    .first()
+    .select('*');
+};
+
 const create = async (connection) => {
   const [id] = await db('profile_book_connections')
     .insert(connection)
@@ -32,4 +39,12 @@ const remove = async (id) => {
   return await db('profile_book_connections').where({ id }).del();
 };
 
-module.exports = { findAll, findBy, findById, create, update, remove };
+module.exports = {
+  findAll,
+  findBy,
+  findById,
+  duplicateCheck,
+  create,
+  update,
+  remove,
+};

@@ -3,6 +3,7 @@ const express = require('express');
 const Connections = require('../../api/models/profileBookConnectionModel');
 const connectionsRouter = require('../../api/routes/profileBookConnections');
 const server = express();
+server.use(express.json());
 
 jest.mock('../../api/models/profileBookConnectionModel');
 
@@ -76,21 +77,27 @@ describe('profile-book router endpoints', () => {
         bookId: 2,
         readingStatus: 2,
       };
-      Connections.findById.mockResolvedValue(undefined);
-      Connections.create.mockResolvedValue([
-        Object.assign({ id: 122 }, connection),
-      ]);
+      Connections.duplicateCheck.mockResolvedValue(undefined);
+      Connections.create.mockResolvedValue(
+        Object.assign({ id: 122 }, connection)
+      );
       const res = await request(server).post('/connect').send(connection);
 
       expect(res.body.message).toBeTruthy();
       expect(res.body.message).toBe('profile-book connection created');
       expect(res.status).toBe(200);
+      expect(res.body.connection).toBeTruthy();
       expect(res.body.connection.id).toBe(122);
+      expect(res.body.connection.profileId).toBe(11);
+      expect(res.body.connection.bookId).toBe(2);
+      expect(res.body.connection.readingStatus).toBe(2);
+      expect(Connections.duplicateCheck.mock.calls.length).toBe(1);
       expect(Connections.create.mock.calls.length).toBe(1);
     });
   });
+
   it('should return 400 when profile-book connection is missing in request body', async () => {
-    Connections.findById.mockResolvedValue(undefined);
+    Connections.duplicateCheck.mockResolvedValue(undefined);
     Connections.create.mockResolvedValue();
     const res = await request(server).post('/connect').send();
 
@@ -99,6 +106,28 @@ describe('profile-book router endpoints', () => {
       'Failure to create profile-book connection because info is missing in request body.'
     );
     expect(res.status).toBe(400);
-    expect(Connections.create.mock.calls.length).toBe(0);
+    expect(Connections.create.mock.calls.length).toBe(1);
+  });
+
+  it('should return 400 when profile-book connection already exists', async () => {
+    const connection = {
+      profileId: 11,
+      bookId: 2,
+      readingStatus: 2,
+    };
+    Connections.duplicateCheck.mockResolvedValue(
+      Object.assign({ id: 122 }, connection)
+    );
+    const res = await request(server).post('/connect').send(connection);
+
+    expect(res.body.message).toBeTruthy();
+    expect(res.body.message).toBe(
+      'Profile-book connection with id 122 already exists'
+    );
+    expect(res.body.message).not.toBe(
+      'Profile-book connection with id 20 already exists'
+    );
+    expect(res.status).toBe(400);
+    expect(Connections.create.mock.calls.length).toBe(1);
   });
 });
