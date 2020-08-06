@@ -401,41 +401,48 @@ router.put('/:id', async (req, res) => {
  *                  type: string
  *                  description: A message about the result
  *                  example: 'Profile-book connection with id ${id} was deleted.'
- *                count_of_deleted_connections::
+ *                count_of_deleted_connections:
  *                  description: The count of profile-book connections deleted.
  *                  example: 1
+ *      500:
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to delete profile-book connection with id ${id}'
+ *                error:
+ *                  description: Info about the DB error
+ *
  */
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   const id = req.params.id;
-  Connections.findById(id)
-    .then((connection) => {
+  try {
+    await Connections.findById(id).then(async (connection) => {
       if (connection) {
-        Connections.remove(id)
-          .then((deleted) => {
-            res.status(200).json({
-              message: `Profile-book connection with id ${id} was deleted.`,
-              count_of_deleted_connections: deleted,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              message: `Could not delete profile-book connection with id: ${id}`,
-              error: err.message,
-            });
+        await Connections.remove(id).then(async (deleted) => {
+          res.status(200).json({
+            message: `Profile-book connection with id ${id} was deleted.`,
+            count_of_deleted_connections: deleted,
           });
+        });
       } else {
         res.status(404).json({
-          error: `Profile-book connection with id ${id} not found.`,
+          message: `Unable to delete profile-book connection because profile-book connection with id ${id} not found.`,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `Profile-book connection with id ${id} not found.`,
-        error: err.message,
-      });
     });
+  } catch (err) {
+    res.status(500).json({
+      message: `Failure to delete profile-book connection with id ${id}`,
+      error: err.message,
+    });
+  }
 });
 
 // Helper function to detect with an object is empty

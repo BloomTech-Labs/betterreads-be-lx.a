@@ -105,6 +105,7 @@ describe('profile-book router endpoints', () => {
         'Failure to create profile-book connection because info is missing in request body.'
       );
       expect(res.status).toBe(400);
+      expect(Connections.duplicateCheck.mock.calls.length).toBe(1);
       expect(Connections.create.mock.calls.length).toBe(1);
     });
 
@@ -127,6 +128,7 @@ describe('profile-book router endpoints', () => {
         'Profile-book connection with id 20 already exists'
       );
       expect(res.status).toBe(400);
+      expect(Connections.duplicateCheck.mock.calls.length).toBe(2);
       expect(Connections.create.mock.calls.length).toBe(1);
     });
 
@@ -256,3 +258,19 @@ describe('profile-book router endpoints', () => {
     });
   });
 });
+
+/*
+{
+    "message": "Profile-book connection with id 14 was deleted.",
+    "count_of_deleted_connections": 1
+}
+
+{
+    "message": `Unable to delete profile-book connection because profile-book connection with id ${id} not found.`
+}
+
+{
+    "message": `Failure to delete profile-book connection with id ${id}`,
+    "error": "Cannot read property 'error' of undefined"
+}
+*/
