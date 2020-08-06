@@ -293,12 +293,25 @@ describe('profile-book router endpoints', () => {
       expect(Connections.findById.mock.calls.length).toBe(7);
       expect(Connections.remove.mock.calls.length).toBe(1);
     });
+
+    it('should return 500 when profile-book connection is not successfully deleted because of DB error', async () => {
+      const connection = {
+        id: 122,
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.findById.mockResolvedValue(connection);
+      Connections.remove.mockRejectedValue(new Error('DB error'));
+      const res = await request(server).delete('/connect/122');
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to delete profile-book connection with id 122'
+      );
+      expect(res.body.error).toBeTruthy();
+      expect(Connections.findById.mock.calls.length).toBe(8);
+      expect(Connections.remove.mock.calls.length).toBe(2);
+    });
   });
 });
-
-/*
-{
-    "message": `Failure to delete profile-book connection with id ${id}`,
-    "error": "Cannot read property 'error' of undefined"
-}
-*/
