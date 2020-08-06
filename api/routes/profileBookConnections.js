@@ -286,8 +286,10 @@ router.post('/', async (req, res) => {
         }
       );
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: err.message });
+      res.status(500).json({
+        error: err.message,
+        message: 'Failure to create profile-book connection',
+      });
     }
   } else {
     res.status(400).json({

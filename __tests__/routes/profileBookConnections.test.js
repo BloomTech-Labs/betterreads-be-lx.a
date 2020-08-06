@@ -94,41 +94,62 @@ describe('profile-book router endpoints', () => {
       expect(Connections.duplicateCheck.mock.calls.length).toBe(1);
       expect(Connections.create.mock.calls.length).toBe(1);
     });
-  });
 
-  it('should return 400 when profile-book connection is missing in request body', async () => {
-    Connections.duplicateCheck.mockResolvedValue(undefined);
-    Connections.create.mockResolvedValue();
-    const res = await request(server).post('/connect').send();
+    it('should return 400 when profile-book connection is missing in request body', async () => {
+      Connections.duplicateCheck.mockResolvedValue(undefined);
+      Connections.create.mockResolvedValue();
+      const res = await request(server).post('/connect').send();
 
-    expect(res.body.message).toBeTruthy();
-    expect(res.body.message).toBe(
-      'Failure to create profile-book connection because info is missing in request body.'
-    );
-    expect(res.status).toBe(400);
-    expect(Connections.create.mock.calls.length).toBe(1);
-  });
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to create profile-book connection because info is missing in request body.'
+      );
+      expect(res.status).toBe(400);
+      expect(Connections.create.mock.calls.length).toBe(1);
+    });
 
-  it('should return 400 when profile-book connection already exists', async () => {
-    const connection = {
-      profileId: 11,
-      bookId: 2,
-      readingStatus: 2,
-    };
-    Connections.duplicateCheck.mockResolvedValue(
-      Object.assign({ id: 122 }, connection)
-    );
-    const res = await request(server).post('/connect').send(connection);
+    it('should return 400 when profile-book connection already exists', async () => {
+      const connection = {
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.duplicateCheck.mockResolvedValue(
+        Object.assign({ id: 122 }, connection)
+      );
+      const res = await request(server).post('/connect').send(connection);
 
-    expect(res.body.message).toBeTruthy();
-    expect(res.body.message).toBe(
-      'Profile-book connection with id 122 already exists'
-    );
-    expect(res.body.message).not.toBe(
-      'Profile-book connection with id 20 already exists'
-    );
-    expect(res.status).toBe(400);
-    expect(Connections.create.mock.calls.length).toBe(1);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Profile-book connection with id 122 already exists'
+      );
+      expect(res.body.message).not.toBe(
+        'Profile-book connection with id 20 already exists'
+      );
+      expect(res.status).toBe(400);
+      expect(Connections.create.mock.calls.length).toBe(1);
+    });
+
+    it('should return 500 when profile-book connection is unable to be created due to DB error', async () => {
+      const connection = {
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+      Connections.duplicateCheck.mockResolvedValue(undefined);
+      Connections.create.mockRejectedValue(new Error('DB error'));
+      const res = await request(server).post('/connect').send(connection);
+
+      expect(res.status).toBe(500);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe('DB error');
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to create profile-book connection'
+      );
+      expect(Connections.duplicateCheck.mock.calls.length).toBe(3);
+      expect(Connections.create.mock.calls.length).toBe(2);
+    });
   });
 
   describe('PUT /connect/:id', () => {
