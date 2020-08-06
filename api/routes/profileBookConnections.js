@@ -363,7 +363,7 @@ router.put('/:id', async (req, res) => {
         }
       });
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       res.status(500).json({
         error: err.message,
         message: `Failure to update profile-book connection with id ${id}`,

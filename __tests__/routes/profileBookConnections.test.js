@@ -206,5 +206,32 @@ describe('profile-book router endpoints', () => {
       expect(Connections.findById.mock.calls.length).toBe(4);
       expect(Connections.update.mock.calls.length).toBe(1);
     });
+
+    it('should return 500 when profile-book connection is not successfully updated, due to DB errors', async () => {
+      const requestBody = {
+        favorite: true,
+      };
+      const connection = {
+        id: 122,
+        profileId: 11,
+        bookId: 2,
+        readingStatus: 2,
+      };
+
+      Connections.findById.mockResolvedValue(connection);
+      Connections.update.mockRejectedValue(new Error('DB error'));
+
+      const res = await request(server).put('/connect/122').send(requestBody);
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to update profile-book connection with id 122'
+      );
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe('DB error');
+
+      expect(Connections.findById.mock.calls.length).toBe(5);
+      expect(Connections.update.mock.calls.length).toBe(2);
+    });
   });
 });
