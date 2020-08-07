@@ -8,6 +8,10 @@ const findBy = (filter) => {
   return db('profile_book_connections').where(filter);
 };
 
+const findByProfileId = (profileId) => {
+  return db('profile_book_connections').where({ profileId: profileId });
+};
+
 const findById = async (id) => {
   return db('profile_book_connections').where({ id }).first().select('*');
 };
@@ -43,6 +47,7 @@ module.exports = {
   findAll,
   findBy,
   findById,
+  findByProfileId,
   duplicateCheck,
   create,
   update,

@@ -1,6 +1,7 @@
 const express = require('express');
 // const authRequired = require('../middleware/authRequired');
 const Connections = require('../models/profileBookConnectionModel');
+const Profiles = require('../models/profileModel');
 const router = express.Router();
 
 /**
@@ -206,24 +207,32 @@ router.get('/:id', function (req, res) {
  *        description: 'Failure to GET profile-book connections with profile id ${profileId}.'
  */
 
-router.get('/profile/:id', function (req, res) {
+router.get('/profile/:id', async function (req, res) {
   const profileId = String(req.params.id);
-  Connections.findBy({ profileId })
-    .then((connections) => {
-      if (connections) {
-        res.status(200).json(connections);
-      } else {
-        res.status(404).json({
-          error: `Profile-book connections with profile id ${profileId} not found.`,
+  const profileExists = await Profiles.findById(profileId);
+  if (profileExists) {
+    Connections.findByProfileId(profileId)
+      .then((connections) => {
+        if (connections.length > 0) {
+          console.log(connections);
+          res.status(200).json(connections);
+        } else {
+          res.status(404).json({
+            error: `Profile-book connections with profile id ${profileId} not found.`,
+          });
+        }
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: `Failure to GET profile-book connections with profile id ${profileId}.`,
+          error: err.message,
         });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `Failure to GET profile-book connections with profile id ${profileId}.`,
-        error: err.message,
       });
+  } else {
+    res.status(404).json({
+      error: `Failure to get profile-book connections because profile with id ${profileId} not found.`,
     });
+  }
 });
 
 /**
@@ -446,13 +455,9 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Helper function to detect with an object is empty
+
 function isEmpty(obj) {
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      return false;
-    }
-  }
-  return true;
+  return Object.keys(obj).length === 0;
 }
 
 module.exports = router;
