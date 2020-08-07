@@ -167,7 +167,6 @@ describe('profile-book router endpoints', () => {
         Object.assign({ id: 122 }, connection)
       );
       const res = await request(server).post('/connect').send(connection);
-
       expect(res.body.message).toBeTruthy();
       expect(res.body.message).toBe('profile-book connection created');
       expect(res.status).toBe(200);

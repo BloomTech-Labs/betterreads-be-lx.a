@@ -4,6 +4,32 @@ const shelfBookConnections = require('../models/shelfBookConnectionModel');
 const Shelves = require('../models/shelfModel');
 const router = express.Router();
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    ShelfBookConnections:
+ *      type: object
+ *      required:
+ *        - id
+ *        - ShelfId
+ *        - ConnectionId
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: auto-generated id
+ *        ShelfId:
+ *          type: integer
+ *          description: id of shelf
+ *        ConnectionId:
+ *          type: integer
+ *          description: id of profile-book connection
+ *      example:
+ *        id: 1
+ *        name: "Book Club"
+ *        profileId: 1
+ */
+
 router.get('/', function (req, res) {
   shelfBookConnections
     .findAll()
