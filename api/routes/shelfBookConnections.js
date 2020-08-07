@@ -53,7 +53,7 @@ const router = express.Router();
  *                  ConnectionId: 1
  *                - id: 2
  *                  ShelfId: 3
- *                  BookId: 10
+ *                  ConnectionId: 10
  *        500:
  *         description: 'Failure to GET shelf-book connections'
  */
