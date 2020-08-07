@@ -26,8 +26,36 @@ const router = express.Router();
  *          description: id of profile-book connection
  *      example:
  *        id: 1
- *        name: "Book Club"
- *        profileId: 1
+ *        ShelfId: 1
+ *        ConnectionId: 1
+ */
+
+/**
+ * @swagger
+ *  /shelves:
+ *   get:
+ *    description: Returns a list of shelf-book connections
+ *    summary: Get a list of all shelf-book connections
+ *    tags:
+ *      - shelfBookConnections
+ *    responses:
+ *      200:
+ *        description: array of shelf-book connections
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ShelfBookConnections'
+ *              example:
+ *                - id: 1
+ *                  ShelfId: 1
+ *                  ConnectionId: 1
+ *                - id: 2
+ *                  ShelfId: 3
+ *                  BookId: 10
+ *        500:
+ *         description: 'Failure to GET shelf-book connections'
  */
 
 router.get('/', function (req, res) {
