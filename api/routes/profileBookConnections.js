@@ -202,7 +202,7 @@ router.get('/:id', function (req, res) {
  *                  profileId: 1
  *                  bookId: 3
  *      404:
- *        description: 'Profile-book connections with profile id ${profileId} not found.'
+ *        description: 'Profile-book connections with profile id ${profileId} not found, or failure to get profile-book connections because profile with id ${profileId} not found.'
  *      500:
  *        description: 'Failure to GET profile-book connections with profile id ${profileId}.'
  */
