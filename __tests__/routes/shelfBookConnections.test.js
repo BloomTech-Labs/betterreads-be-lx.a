@@ -31,6 +31,7 @@ describe('shelf-book router endpoints', () => {
       expect(res.body.message).toBeTruthy();
       expect(res.body.message).toBe('Failure to GET shelf-book connections');
       expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe('DB error');
       expect(shelfBookConnections.findAll.mock.calls.length).toBe(2);
     });
   });
@@ -59,6 +60,21 @@ describe('shelf-book router endpoints', () => {
       expect(res.body.error).toBe(
         'Shelf-book connection with id 20 not found.'
       );
+      expect(shelfBookConnections.findById.mock.calls.length).toBe(2);
+    });
+
+    it('should return 500 when shelf-book connection is not found due to DB error', async () => {
+      shelfBookConnections.findById.mockRejectedValue(new Error('DB error'));
+      const res = await request(server).get('/organize/20');
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to GET shelf-book connection with id 20.'
+      );
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe('DB error');
+      expect(shelfBookConnections.findById.mock.calls.length).toBe(3);
     });
   });
 
