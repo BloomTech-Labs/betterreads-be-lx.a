@@ -32,7 +32,7 @@ const router = express.Router();
 
 /**
  * @swagger
- *  /shelves:
+ *  /organize:
  *   get:
  *    description: Returns a list of shelf-book connections
  *    summary: Get a list of all shelf-book connections
@@ -71,6 +71,40 @@ router.get('/', function (req, res) {
       });
     });
 });
+
+/**
+ * @swagger
+ * components:
+ *  parameters:
+ *    id:
+ *      name: id
+ *      in: path
+ *      description: ID of the shelf-book connection to return
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ *
+ * /organize/{id}:
+ *  get:
+ *    description: Find shelf-book connections by ID
+ *    summary: Returns a single shelf-book connection
+ *    tags:
+ *      - shelfBookConnections
+ *    parameters:
+ *      - $ref: '#/components/parameters/id'
+ *    responses:
+ *      200:
+ *        description: A shelf-book connection object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/ShelfBookConnections'
+ *      404:
+ *        description: 'Shelf-book connection with id ${id} not found.'
+ *      500:
+ *        description: 'Failure to GET shelf-book connection with id ${id}.'
+ */
 
 router.get('/:id', function (req, res) {
   const id = String(req.params.id);

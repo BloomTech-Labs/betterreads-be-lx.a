@@ -3,6 +3,7 @@ const express = require('express');
 const shelfBookConnections = require('../../api/models/shelfBookConnectionModel');
 const shelfBookConnectionsRouter = require('../../api/routes/shelfBookConnections');
 const server = express();
+server.use(express.json());
 
 jest.mock('../../api/models/shelfBookConnectionModel');
 
