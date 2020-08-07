@@ -129,6 +129,49 @@ router.get('/:id', function (req, res) {
 
 // To GET the shelf-book connections for a specified shelf
 
+/**
+ * @swagger
+ * components:
+ *  parameters:
+ *    shelfId:
+ *      name: shelfId
+ *      in: path
+ *      description: ID of the shelf
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ *
+ * /organize/shelf/{shelfId}:
+ *  get:
+ *    description: Find shelf-book connections for a specified shelf
+ *    summary: Returns shelf-book connections for a specified shelf
+ *    tags:
+ *      - shelfBookConnections
+ *    parameters:
+ *      - $ref: '#/components/parameters/shelfId'
+ *    responses:
+ *      200:
+ *        description: array of shelf-book connections
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ShelfBookConnections'
+ *              example:
+ *                - id: 1
+ *                  ShelfId: 1
+ *                  ConnectionId: 1
+ *                - id: 2
+ *                  ShelfId: 4
+ *                  ConnectionId: 3
+ *      404:
+ *        description: 'Shelf-book connections where ShelfId is ${ShelfId} are not found, or shelf with ShelfId ${ShelfId} was not found.'
+ *      500:
+ *        description: 'Failure to GET shelf-book connections where ShelfId is ${ShelfId}.'
+ */
+
 router.get('/shelf/:shelfId', function (req, res) {
   const ShelfId = String(req.params.shelfId);
   Shelves.findById(ShelfId).then((shelfResponse) => {
