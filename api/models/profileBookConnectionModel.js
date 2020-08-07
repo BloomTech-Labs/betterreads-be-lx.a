@@ -4,10 +4,6 @@ const findAll = async () => {
   return await db('profile_book_connections');
 };
 
-const findBy = (filter) => {
-  return db('profile_book_connections').where(filter);
-};
-
 const findByProfileId = (profileId) => {
   return db('profile_book_connections').where({ profileId: profileId });
 };
@@ -45,7 +41,6 @@ const remove = async (id) => {
 
 module.exports = {
   findAll,
-  findBy,
   findById,
   findByProfileId,
   duplicateCheck,
