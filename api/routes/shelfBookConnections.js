@@ -177,9 +177,9 @@ router.get('/shelf/:shelfId', function (req, res) {
   Shelves.findById(ShelfId).then((shelfResponse) => {
     if (shelfResponse) {
       shelfBookConnections
-        .findBy({ ShelfId })
+        .findByShelfId(ShelfId)
         .then((connections) => {
-          if (connections) {
+          if (connections.length > 0) {
             res.status(200).json(connections);
           } else {
             res.status(404).json({
@@ -195,7 +195,7 @@ router.get('/shelf/:shelfId', function (req, res) {
         });
     } else {
       res.status(404).json({
-        error: `Shelf with ShelfId ${ShelfId} was not found.`,
+        error: `Failure to GET shelf-book connections because shelf with ShelfId ${ShelfId} was not found.`,
       });
     }
   });
@@ -270,4 +270,5 @@ router.delete('/:id', (req, res) => {
       });
     });
 });
+
 module.exports = router;

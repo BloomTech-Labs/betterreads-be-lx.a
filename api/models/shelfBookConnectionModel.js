@@ -8,6 +8,10 @@ const findBy = (filter) => {
   return db('shelf_book_connections').where(filter);
 };
 
+const findByShelfId = (ShelfId) => {
+  return db('shelf_book_connections').where({ ShelfId: ShelfId });
+};
+
 const findById = async (id) => {
   return db('shelf_book_connections').where({ id }).first().select('*');
 };
@@ -23,4 +27,4 @@ const remove = async (id) => {
   return await db('shelf_book_connections').where({ id }).del();
 };
 
-module.exports = { findAll, findBy, findById, create, remove };
+module.exports = { findAll, findBy, findByShelfId, findById, create, remove };

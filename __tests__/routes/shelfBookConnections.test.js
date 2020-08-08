@@ -2,10 +2,12 @@ const request = require('supertest');
 const express = require('express');
 const shelfBookConnections = require('../../api/models/shelfBookConnectionModel');
 const shelfBookConnectionsRouter = require('../../api/routes/shelfBookConnections');
+const Shelves = require('../../api/models/shelfModel');
 const server = express();
 server.use(express.json());
 
 jest.mock('../../api/models/shelfBookConnectionModel');
+jest.mock('../../api/models/shelfModel');
 
 describe('shelf-book router endpoints', () => {
   beforeAll(() => {
@@ -80,7 +82,12 @@ describe('shelf-book router endpoints', () => {
 
   describe('GET /organize/shelf/:shelfId', () => {
     it('should return 200 when shelf-book connections found for specified shelf', async () => {
-      shelfBookConnections.findBy.mockResolvedValue([
+      Shelves.findById.mockResolvedValue({
+        id: 2,
+        name: 'Books Better Than Their Movies',
+        profileId: 8,
+      });
+      shelfBookConnections.findByShelfId.mockResolvedValue([
         {
           id: 20,
           ShelfId: 2,
@@ -98,7 +105,61 @@ describe('shelf-book router endpoints', () => {
       expect(res.body[0].id).toBe(20);
       expect(res.body[0].ShelfId).toBe(2);
       expect(res.body[0].ConnectionId).toBe(3);
-      expect(shelfBookConnections.findBy.mock.calls.length).toBe(1);
+      expect(Shelves.findById.mock.calls.length).toBe(1);
+      expect(shelfBookConnections.findByShelfId.mock.calls.length).toBe(1);
+    });
+
+    it('should return 404 when specified shelf is not found', async () => {
+      Shelves.findById.mockResolvedValue(undefined);
+
+      const res = await request(server).get('/organize/shelf/2000');
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe(
+        'Failure to GET shelf-book connections because shelf with ShelfId 2000 was not found.'
+      );
+      expect(Shelves.findById.mock.calls.length).toBe(2);
+      expect(shelfBookConnections.findByShelfId.mock.calls.length).toBe(1);
+    });
+
+    it('should return 404 when shelf-book connections are not found for specified shelf', async () => {
+      Shelves.findById.mockResolvedValue({
+        id: 3,
+        name: 'Books That Look Good Enough to Eat',
+        profileId: 8,
+      });
+      shelfBookConnections.findByShelfId.mockResolvedValue([]);
+      const res = await request(server).get('/organize/shelf/3');
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe(
+        'Shelf-book connections where ShelfId is 3 are not found.'
+      );
+      expect(Shelves.findById.mock.calls.length).toBe(3);
+      expect(shelfBookConnections.findByShelfId.mock.calls.length).toBe(2);
+    });
+
+    it('should return 500 when shelf-book connections are not found due to DB error', async () => {
+      Shelves.findById.mockResolvedValue({
+        id: 4,
+        name: 'Favorite Books About Axolotls',
+        profileId: 8,
+      });
+      shelfBookConnections.findByShelfId.mockRejectedValue(
+        new Error('DB error')
+      );
+      const res = await request(server).get('/organize/shelf/4');
+
+      expect(res.status).toBe(500);
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to GET shelf-book connections where ShelfId is 4.'
+      );
+      expect(Shelves.findById.mock.calls.length).toBe(4);
+      expect(shelfBookConnections.findByShelfId.mock.calls.length).toBe(3);
     });
   });
 });
