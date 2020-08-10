@@ -234,40 +234,37 @@ router.get('/shelf/:shelfId', function (req, res) {
  *                  $ref: '#/components/schemas/ShelfBookConnections'
  */
 
-router.post('/:shelfId/:profileBookConnectionId', (req, res) => {
+router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
   const ShelfId = String(req.params.shelfId);
   const ConnectionId = String(req.params.profileBookConnectionId);
-  shelfBookConnections
-    .findBy({ ShelfId, ConnectionId })
-    .first()
-    .then((connectionResult) => {
-      if (connectionResult == undefined) {
-        // shelf-book connection not found, so let's create it:
-        shelfBookConnections
-          .create({ ShelfId, ConnectionId })
-          .then((newConnection) => {
-            res.status(200).json({
-              message: 'shelf-book connection created',
-              connection: newConnection,
+
+  try {
+    await shelfBookConnections
+      .duplicateCheck(ShelfId, ConnectionId)
+      .then(async (connectionResult) => {
+        console.log(connectionResult);
+        if (connectionResult.length < 1) {
+          // shelf-book connection not found, so let's create it:
+          await shelfBookConnections
+            .create({ ShelfId, ConnectionId })
+            .then((newConnection) => {
+              res.status(200).json({
+                message: 'shelf-book connection created',
+                connection: newConnection,
+              });
             });
-          })
-          .catch((err) => {
-            console.error(err);
-            res.status(500).json({
-              message: 'Failure to create new shelf-book connection',
-              error: err.message,
-            });
+        } else {
+          res.status(400).json({
+            message: `shelf-book connection with id ${connectionResult[0].id} already exists`,
           });
-      } else {
-        res.status(400).json({
-          message: `shelf-book connection with id ${connectionResult.id} already exists`,
-        });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: err.message });
+        }
+      });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: 'Failure to create new shelf-book connection',
     });
+  }
 });
 
 router.delete('/:id', (req, res) => {

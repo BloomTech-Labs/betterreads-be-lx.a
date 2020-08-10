@@ -162,4 +162,27 @@ describe('shelf-book router endpoints', () => {
       expect(shelfBookConnections.findByShelfId.mock.calls.length).toBe(3);
     });
   });
+
+  describe('POST /organize/:shelfId/:profileBookConnectionId', () => {
+    it('should return 200 when shelf-book connection is created', async () => {
+      const newShelfBookConnection = {
+        id: 122,
+        ShelfId: 3,
+        ConnectionId: 4,
+      };
+      shelfBookConnections.duplicateCheck.mockResolvedValue([]);
+      shelfBookConnections.create.mockResolvedValue(newShelfBookConnection);
+      const res = await request(server).post('/organize/3/4');
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe('shelf-book connection created');
+
+      expect(res.body.connection).toBeTruthy();
+      expect(res.body.connection.id).toBe(122);
+      expect(res.body.connection.ShelfId).toBe(3);
+      expect(res.body.connection.ConnectionId).toBe(4);
+      expect(shelfBookConnections.duplicateCheck.mock.calls.length).toBe(1);
+      expect(shelfBookConnections.create.mock.calls.length).toBe(1);
+    });
+  });
 });
