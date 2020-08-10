@@ -201,6 +201,39 @@ router.get('/shelf/:shelfId', function (req, res) {
   });
 });
 
+/**
+ * @swagger
+ * /organize:
+ *  post:
+ *    summary: Add a shelf-book connection
+ *    tags:
+ *      - shelfBookConnections
+ *    requestBody:
+ *      description: Shelf-book connection object to to be added
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/ShelfBookConnections'
+ *    responses:
+ *      500:
+ *        description: 'Failure to create new shelf-book connection'
+ *      400:
+ *        description: 'Failure because connection between shelf and book already exists'
+ *      200:
+ *        description: An object containing both a message and a shelf-book connection object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the result
+ *                  example: 'shelf-book connection created'
+ *                connection:
+ *                  $ref: '#/components/schemas/ShelfBookConnections'
+ */
+
 router.post('/:shelfId/:profileBookConnectionId', (req, res) => {
   const ShelfId = String(req.params.shelfId);
   const ConnectionId = String(req.params.profileBookConnectionId);
