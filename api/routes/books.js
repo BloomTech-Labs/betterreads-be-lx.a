@@ -61,6 +61,29 @@ router.get('/', function (req, res) {
     });
 });
 
+/**
+ * @swagger
+ *  /books/:id:
+ *  get:
+ *    description: Returns requested book by ID
+ *    summary: Retrieve information on a selected book
+ *    tags:
+ *      - book
+ *    responses:
+ *      200:
+ *        description: object - book
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              items:
+ *                $ref: '#/components/schemas/Book'
+ *              example:
+ *                - googleId: 'hFfhrCWiLSMC'
+ *                  title: 'The Hobbit, Or, There and Back Again'
+ *                  authors: 'John Ronald Reuel Tolkien'
+ */
+
 router.get('/:id', function (req, res) {
   const id = String(req.params.id);
   Books.findById(id)
@@ -75,6 +98,38 @@ router.get('/:id', function (req, res) {
       res.status(500).json({ error: err.message });
     });
 });
+
+/**
+ * @swagger
+ * /books
+ *  post:
+ *    summary: Add a book
+ *    tags:
+ *      - books
+ *    requestBody:
+ *      description: Book object to be added
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/Books'
+ *    responses:
+ *      400:
+ *        $ref: '#/components/responses/BadRequest'
+ *      401:
+ *        $ref: '#/components/responses/Unauthorized Error'
+ *      201:
+ *        description: A book object
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description:
+ *      500:
+ *
+ */
 
 router.post('/', async (req, res) => {
   const book = req.body;
