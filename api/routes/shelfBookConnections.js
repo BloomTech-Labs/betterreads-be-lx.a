@@ -203,17 +203,32 @@ router.get('/shelf/:shelfId', function (req, res) {
 
 /**
  * @swagger
- * /organize:
+ * components:
+ *  parameters:
+ *    ShelfId:
+ *      name: ShelfId
+ *      in: path
+ *      description: ID of the shelf
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ *    ConnectionId:
+ *      name: ConnectionId
+ *      in: path
+ *      description: ID of the profile-book connection
+ *      required: true
+ *      example: 1
+ *      schema:
+ *        type: integer
+ * /organize/{ShelfId}/{ConnectionId}:
  *  post:
  *    summary: Add a shelf-book connection
  *    tags:
  *      - shelfBookConnections
- *    requestBody:
- *      description: Shelf-book connection object to to be added
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/ShelfBookConnections'
+ *    parameters:
+ *      - $ref: '#/components/parameters/ShelfId'
+ *      - $ref: '#/components/parameters/ConnectionId'
  *    responses:
  *      500:
  *        description: 'Failure to create new shelf-book connection'
@@ -267,38 +282,81 @@ router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
+/**
+ * @swagger
+ * /organize/{id}:
+ *  delete:
+ *    summary: Remove a shelf-book connection
+ *    tags:
+ *      - shelfBookConnections
+ *    parameters:
+ *      - $ref: '#/components/parameters/id'
+ *    responses:
+ *      200:
+ *        description: An object containing a message and count of connections deleted
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the result
+ *                  example: 'Shelf-book connection with id 77777 was deleted.'
+ *                count_of_deleted_connections:
+ *                  description: The count of shelf-book connections deleted.
+ *                  example: 1
+ *      404:
+ *        description: A object containing a message
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Unable to delete shelf-book connection because shelf-book connection with id 200043 not found.'
+ *      500:
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to delete shelf-book connection with id 3141592'
+ *                error:
+ *                  description: Info about the DB error
+ *                  example: 'DB error due to something unexpected'
+ *
+ */
+
+router.delete('/:id', async (req, res) => {
   const id = req.params.id;
-  shelfBookConnections
-    .findById(id)
-    .then((connection) => {
+  try {
+    await shelfBookConnections.findById(id).then(async (connection) => {
       if (connection) {
-        shelfBookConnections
-          .remove(id)
-          .then((deleted) => {
-            res.status(200).json({
-              message: `Shelf-book connection with id ${id} was deleted.`,
-              count_of_deleted_connections: deleted,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              message: `Could not delete shelf-book connection with id: ${id}`,
-              error: err.message,
-            });
+        await shelfBookConnections.remove(id).then(async (deleted) => {
+          res.status(200).json({
+            message: `Shelf-book connection with id ${id} was deleted.`,
+            count_of_deleted_connections: deleted,
           });
+        });
       } else {
         res.status(404).json({
-          error: `Shelf-book connection with id ${id} not found.`,
+          message: `Unable to delete shelf-book connection because shelf-book connection with id ${id} not found.`,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `Shelf-book connection with id ${id} not found.`,
-        error: err.message,
-      });
     });
+  } catch (err) {
+    res.status(500).json({
+      message: `Failure to delete shelf-book connection with id ${id}`,
+      error: err.message,
+    });
+  }
 });
 
 module.exports = router;
