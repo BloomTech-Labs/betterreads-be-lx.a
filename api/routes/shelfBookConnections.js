@@ -39,6 +39,20 @@ const router = express.Router();
  *    tags:
  *      - shelfBookConnections
  *    responses:
+ *      500:
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to GET shelf-book connections'
+ *                error:
+ *                  description: Info about the DB error
+ *                  example: 'DB error due to something unexpected'
  *      200:
  *        description: array of shelf-book connections
  *        content:
@@ -54,8 +68,6 @@ const router = express.Router();
  *                - id: 2
  *                  ShelfId: 3
  *                  ConnectionId: 10
- *        500:
- *         description: 'Failure to GET shelf-book connections'
  */
 
 router.get('/', function (req, res) {
@@ -101,9 +113,30 @@ router.get('/', function (req, res) {
  *            schema:
  *              $ref: '#/components/schemas/ShelfBookConnections'
  *      404:
- *        description: 'Shelf-book connection with id ${id} not found.'
+ *        description: A object containing a error message
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: A message about the failure
+ *                   example: 'Shelf-book connection with 7823321 not found.'
  *      500:
- *        description: 'Failure to GET shelf-book connection with id ${id}.'
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to GET shelf-book connection with id 234098888.'
+ *                error:
+ *                  description: Info about the DB error
+ *                  example: 'DB error due to something unexpected'
  */
 
 router.get('/:id', function (req, res) {
@@ -173,7 +206,7 @@ router.get('/:id', function (req, res) {
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 error:
  *                   type: string
  *                   description: A message about the failure
  *                   example: 'Failure to GET shelf-book connections because shelf with ShelfId 2098743 was not found.'
