@@ -275,6 +275,9 @@ router.put('/', authRequired, (req, res) => {
  *                profile:
  *                  $ref: '#/components/schemas/Profile'
  */
+
+// Note: knex's .del() resolves the promise / fulfills the callback with the number of affected rows for the query.
+// Calling the number that is returned 'profile' might be misleading.
 router.delete('/:id', authRequired, (req, res) => {
   const id = req.params.id;
   Profiles.remove(id)
