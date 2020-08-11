@@ -184,5 +184,42 @@ describe('shelf-book router endpoints', () => {
       expect(shelfBookConnections.duplicateCheck.mock.calls.length).toBe(1);
       expect(shelfBookConnections.create.mock.calls.length).toBe(1);
     });
+
+    it('should return 400 when shelf-book connection already exists', async () => {
+      const existingShelfBookConnection = [
+        {
+          id: 122,
+          ShelfId: 3,
+          ConnectionId: 4,
+        },
+      ];
+      shelfBookConnections.duplicateCheck.mockResolvedValue(
+        existingShelfBookConnection
+      );
+
+      const res = await request(server).post('/organize/3/4');
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'shelf-book connection with id 122 already exists'
+      );
+      expect(shelfBookConnections.duplicateCheck.mock.calls.length).toBe(2);
+      expect(shelfBookConnections.create.mock.calls.length).toBe(1);
+    });
+
+    it('should return 500 when shelf-book connection is not added, due to DB error', async () => {
+      shelfBookConnections.duplicateCheck.mockResolvedValue([]);
+      shelfBookConnections.create.mockRejectedValue(new Error('DB error'));
+
+      const res = await request(server).post('/organize/3/4');
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to create new shelf-book connection'
+      );
+      expect(res.body.error).toBeTruthy();
+      expect(shelfBookConnections.duplicateCheck.mock.calls.length).toBe(3);
+      expect(shelfBookConnections.create.mock.calls.length).toBe(2);
+    });
   });
 });
