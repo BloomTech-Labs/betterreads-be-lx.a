@@ -64,68 +64,55 @@ router.get('/profile/:id', function (req, res) {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const shelf = req.body;
   if (shelf) {
-    const id = shelf.id || 0;
-    Shelves.findBy({ id })
-      .first()
-      .then((sr) => {
-        if (sr == undefined) {
-          //shelf not found so let's insert it
-          Shelves.create(shelf)
-            .then((created_shelf) => {
+    try {
+      const id = shelf.id || 0;
+      await Shelves.findBy({ id })
+        .first()
+        .then(async (sr) => {
+          if (sr == undefined) {
+            //shelf not found so let's insert it
+            await Shelves.create(shelf).then((created_shelf) => {
               res
                 .status(200)
                 .json({ message: 'shelf created', shelf: created_shelf });
-            })
-            .catch((err) => {
-              console.error(err);
-              res.status(500).json({ message: err.message });
             });
-        } else {
-          res.status(400).json({ message: 'shelf already exists' });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({ message: err.message });
-      });
+          } else {
+            res.status(400).json({ message: 'shelf already exists' });
+          }
+        });
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+    }
   } else {
     res.status(400).json({ message: 'shelf info is missing in request body' });
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const id = String(req.params.id);
   const shelfInfo = req.body;
   if (shelfInfo) {
-    Shelves.findById(id)
-      .then((shelfResponse) => {
+    try {
+      Shelves.findById(id).then((shelfResponse) => {
         if (shelfResponse == undefined) {
           res.status(400).json({
             message: `Shelf with id ${id} not found.`,
           });
         } else {
-          Shelves.update(id, shelfInfo)
-            .then((updatedShelf) => {
-              res.status(200).json({
-                message: `Shelf with id ${id} is updated.`,
-                shelf: updatedShelf,
-              });
-            })
-            .catch((err) => {
-              res.status(500).json({
-                message: `Failure to update shelf with id ${id}`,
-                error: err.message,
-              });
+          Shelves.update(id, shelfInfo).then((updatedShelf) => {
+            res.status(200).json({
+              message: `Shelf with id ${id} is updated.`,
+              shelf: updatedShelf,
             });
+          });
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({ message: err.message });
       });
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+    }
   } else {
     res.status(400).json({
       message: 'Request body is missing the shelf info needed for an update.',
@@ -133,36 +120,26 @@ router.put('/:id', (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   const id = req.params.id;
-  Shelves.findById(id)
-    .then((shelf) => {
+  try {
+    await Shelves.findById(id).then(async (shelf) => {
       if (shelf) {
-        Shelves.remove(id)
-          .then((deleted) => {
-            res.status(200).json({
-              message: `Shelf with id ${id} was deleted.`,
-              count_of_deleted_shelves: deleted,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              message: `Could not delete shelf with id: ${id}`,
-              error: err.message,
-            });
+        await Shelves.remove(id).then((deleted) => {
+          res.status(200).json({
+            message: `Shelf with id ${id} was deleted.`,
+            count_of_deleted_shelves: deleted,
           });
+        });
       } else {
         res.status(404).json({
           error: `Shelf with id ${id} not found.`,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `Shelf with id ${id} not found.`,
-        error: err.message,
-      });
     });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
 module.exports = router;

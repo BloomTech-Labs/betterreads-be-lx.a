@@ -335,6 +335,7 @@ router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
       .then(async (connectionResult) => {
         console.log(connectionResult);
         if (connectionResult.length < 1) {
+
           // shelf-book connection not found, so let's create it:
           await shelfBookConnections
             .create({ ShelfId, ConnectionId })
@@ -346,6 +347,7 @@ router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
             });
         } else {
           res.status(400).json({
+
             message: `shelf-book connection with id ${connectionResult[0].id} already exists`,
           });
         }
@@ -416,6 +418,7 @@ router.delete('/:id', async (req, res) => {
     await shelfBookConnections.findById(id).then(async (connection) => {
       if (connection) {
         await shelfBookConnections.remove(id).then(async (deleted) => {
+
           res.status(200).json({
             message: `Shelf-book connection with id ${id} was deleted.`,
             count_of_deleted_connections: deleted,
@@ -427,11 +430,13 @@ router.delete('/:id', async (req, res) => {
         });
       }
     });
+
   } catch (err) {
     res.status(500).json({
       message: `Failure to delete shelf-book connection with id ${id}.`,
       error: err.message,
     });
+
   }
 });
 

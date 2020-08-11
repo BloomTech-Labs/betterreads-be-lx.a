@@ -279,6 +279,7 @@ router.post('/', async (req, res) => {
     try {
       await Connections.duplicateCheck(profileId, bookId).then(
         async (connectionResult) => {
+
           if (connectionResult == undefined) {
             // Profile-book connection not found, so let's create it:
             await Connections.create(connection).then((newConnection) => {
@@ -299,6 +300,7 @@ router.post('/', async (req, res) => {
         error: err.message,
         message: 'Failure to create profile-book connection',
       });
+
     }
   } else {
     res.status(400).json({
