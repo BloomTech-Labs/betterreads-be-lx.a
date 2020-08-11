@@ -222,4 +222,50 @@ describe('shelf-book router endpoints', () => {
       expect(shelfBookConnections.create.mock.calls.length).toBe(2);
     });
   });
+
+  describe('DELETE /organize/:id', () => {
+    it('should return 200 when shelf-book connection is successfully deleted', async () => {
+      shelfBookConnections.findById.mockResolvedValue({
+        id: 20,
+        ShelfId: 2,
+        ConnectionId: 3,
+      });
+      shelfBookConnections.remove.mockResolvedValue(1);
+      const res = await request(server).delete('/organize/20');
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Shelf-book connection with id 20 was deleted.'
+      );
+      expect(res.body.count_of_deleted_connections).toBeTruthy();
+      expect(res.body.count_of_deleted_connections).toBe(1);
+      expect(shelfBookConnections.findById.mock.calls.length).toBe(4);
+    });
+
+    it('should return 404 when no shelf-book connection found', async () => {
+      shelfBookConnections.findById.mockResolvedValue();
+      const res = await request(server).delete('/organize/20');
+
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBe(
+        'Unable to delete shelf-book connection because shelf-book connection with id 20 not found.'
+      );
+      expect(shelfBookConnections.findById.mock.calls.length).toBe(5);
+    });
+
+    it('should return 500 when shelf-book connection is not found due to DB error', async () => {
+      shelfBookConnections.findById.mockRejectedValue(new Error('DB error'));
+      const res = await request(server).delete('/organize/20');
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBeTruthy();
+      expect(res.body.message).toBe(
+        'Failure to delete shelf-book connection with id 20.'
+      );
+      expect(res.body.error).toBeTruthy();
+      expect(res.body.error).toBe('DB error');
+      expect(shelfBookConnections.findById.mock.calls.length).toBe(6);
+    });
+  });
 });

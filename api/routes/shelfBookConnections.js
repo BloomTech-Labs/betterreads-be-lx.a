@@ -167,9 +167,30 @@ router.get('/:id', function (req, res) {
  *                  ShelfId: 4
  *                  ConnectionId: 3
  *      404:
- *        description: 'Shelf-book connections where ShelfId is ${ShelfId} are not found, or shelf with ShelfId ${ShelfId} was not found.'
+ *        description: A object containing a error message
+ *        content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: A message about the failure
+ *                   example: 'Failure to GET shelf-book connections because shelf with ShelfId 2098743 was not found.'
  *      500:
- *        description: 'Failure to GET shelf-book connections where ShelfId is ${ShelfId}.'
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to GET shelf-book connections where ShelfId is 209084382910.'
+ *                error:
+ *                  description: Info about the DB error
+ *                  example: 'DB error due to something unexpected'
  */
 
 router.get('/shelf/:shelfId', function (req, res) {
@@ -231,9 +252,30 @@ router.get('/shelf/:shelfId', function (req, res) {
  *      - $ref: '#/components/parameters/ConnectionId'
  *    responses:
  *      500:
- *        description: 'Failure to create new shelf-book connection'
+ *        description: A object containing a message and error info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'Failure to create new shelf-book connection'
+ *                error:
+ *                  description: Info about the DB error
+ *                  example: 'DB error due to something unexpected'
  *      400:
- *        description: 'Failure because connection between shelf and book already exists'
+ *        description: A object containing a message
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: A message about the failure
+ *                  example: 'shelf-book connection with id 20 already exists'
  *      200:
  *        description: An object containing both a message and a shelf-book connection object
  *        content:
@@ -247,6 +289,7 @@ router.get('/shelf/:shelfId', function (req, res) {
  *                  example: 'shelf-book connection created'
  *                connection:
  *                  $ref: '#/components/schemas/ShelfBookConnections'
+ *
  */
 
 router.post('/:shelfId/:profileBookConnectionId', async (req, res) => {
@@ -353,7 +396,7 @@ router.delete('/:id', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      message: `Failure to delete shelf-book connection with id ${id}`,
+      message: `Failure to delete shelf-book connection with id ${id}.`,
       error: err.message,
     });
   }
