@@ -123,6 +123,13 @@ router.get('/:id', authRequired, function (req, res) {
     });
 });
 
+router.get('/:id/fullLibrary', function (req, res) {
+  const id = String(req.params.id);
+  Profiles.profileLibrary(id)
+    .then((profile) => res.status(200).json(profile))
+    .catch((err) => res.status(500).json({ error: err.message }));
+});
+
 /**
  * @swagger
  * /profile:
